@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lake Card v2 - McGee Creek</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #e8f4f8;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    min-height: 100vh; padding: 20px;
+  }
+  .hint { font-size: 13px; color: #4a8aaa; margin-bottom: 14px; }
+  .card-scene { width: 540px; height: 440px; perspective: 1200px; cursor: pointer; }
+  .card { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1); }
+  .card-scene.flipped .card { transform: rotateY(180deg); }
+  .card-front, .card-back {
+    position: absolute; width: 100%; height: 100%;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    border-radius: 14px; overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,80,120,0.15);
+  }
+  .card-front { background: #f5fbff; display: flex; flex-direction: column; }
+  .front-header { background: linear-gradient(135deg, #29b6d8 0%, #1a8aaa 100%); color: #fff; padding: 18px 24px 14px; }
+  .front-header .section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.85; margin-bottom: 4px; }
+  .front-header h1 { font-size: 24px; font-weight: 800; }
+  .front-header .subtitle { font-size: 12px; opacity: 0.85; margin-top: 4px; font-style: italic; }
+  .stats-section { padding: 14px 16px 8px; }
+  .stats-label { font-size: 11px; font-weight: 700; color: #1a8aaa; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+  .stats-row { display: flex; gap: 8px; }
+  .stat-pill { flex: 1; border-radius: 10px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .stat-pill.chla   { background: #fff3cd; border: 2px solid #e9a820; }
+  .stat-pill.tn     { background: #d4f0f7; border: 2px solid #29b6d8; }
+  .stat-pill.tp     { background: #d4f7e8; border: 2px solid #28b07a; }
+  .stat-pill.secchi { background: #e8e8f7; border: 2px solid #7070cc; }
+  .stat-pill.turb   { background: #fde8d8; border: 2px solid #e07040; }
+  .pill-value { font-size: 20px; font-weight: 800; line-height: 1; }
+  .stat-pill.chla   .pill-value { color: #c07800; }
+  .stat-pill.tn     .pill-value { color: #1a8aaa; }
+  .stat-pill.tp     .pill-value { color: #1a7a52; }
+  .stat-pill.secchi .pill-value { color: #4040aa; }
+  .stat-pill.turb   .pill-value { color: #b04020; }
+  .pill-label { font-size: 9.5px; font-weight: 700; color: #333; margin-top: 5px; }
+  .pill-desc { font-size: 9px; color: #777; font-style: italic; margin-top: 3px; }
+  .scale-section { padding: 8px 16px 6px; }
+  .scale-label { font-size: 11px; font-weight: 700; color: #555; margin-bottom: 8px; text-align: center; }
+  .scale-bar { display: flex; border-radius: 30px; overflow: hidden; height: 32px; }
+  .scale-seg { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; }
+  .scale-seg.clean  { background: #29b6d8; }
+  .scale-seg.murky  { background: #6ac04a; }
+  .scale-seg.algae  { background: #f07020; }
+  .scale-seg.danger { background: #d03030; }
+  .front-footer { margin: 6px 16px 12px; background: #fff8e6; border: 1.5px solid #e9a820; border-radius: 8px; padding: 8px 14px; display: flex; align-items: center; gap: 10px; }
+  .front-footer .icon { font-size: 20px; }
+  .front-footer .msg { font-size: 12px; font-weight: 700; color: #b07800; flex: 1; }
+  .flip-cta { font-size: 11px; color: #1a8aaa; font-weight: 600; white-space: nowrap; }
+  .card-back { background: #fff; transform: rotateY(180deg); display: flex; flex-direction: column; }
+  .back-header { background: linear-gradient(135deg, #1a7a52 0%, #28b07a 100%); color: #fff; padding: 14px 22px; display: flex; align-items: center; justify-content: space-between; }
+  .back-header h2 { font-size: 17px; font-weight: 800; }
+  .back-header span { font-size: 11px; opacity: 0.85; font-style: italic; }
+  .chart-area { flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px; background: #f5fbf8; }
+  .chart-area img { max-width: 100%; max-height: 100%; border-radius: 6px; object-fit: contain; }
+  .chart-placeholder { display: flex; flex-direction: column; align-items: center; gap: 10px; color: #aaa; text-align: center; }
+  .chart-placeholder .icon { font-size: 40px; }
+  .chart-placeholder p { font-size: 13px; max-width: 270px; line-height: 1.6; }
+  .back-footer { padding: 8px 16px 12px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #d8eee8; }
+  .param-tabs { display: flex; gap: 5px; flex-wrap: wrap; }
+  .param-tab { font-size: 10px; padding: 3px 9px; border-radius: 12px; border: 1.5px solid #28b07a; color: #28b07a; cursor: pointer; background: #fff; font-weight: 700; transition: all 0.2s; }
+  .param-tab.active, .param-tab:hover { background: #28b07a; color: #fff; }
+  .flip-hint-back { font-size: 11px; color: #aaa; }
+  .owrb-footer { margin-top: 10px; font-size: 11px; color: #7aacbc; }
+</style>
+</head>
+<body>
+<p class="hint">Click the card to flip</p>
+<div class="card-scene" onclick="this.classList.toggle('flipped')">
+  <div class="card">
+    <div class="card-front">
+      <div class="front-header">
+        <div class="section-label">Oklahoma Water Quality</div>
+        <h1>McGee Creek Lake</h1>
+        <div class="subtitle">Sensitive Water Supply reservoir &nbsp;|&nbsp; Period of Record: 2001–2023</div>
+      </div>
+      <div class="stats-section">
+        <div class="stats-label">📊 Trend Summary</div>
+        <div class="stats-row">
+          <div class="stat-pill chla"><div class="pill-value">+230%</div><div class="pill-label">Chlorophyll a</div><div class="pill-desc">overall increase</div></div>
+          <div class="stat-pill tn"><div class="pill-value">+41%</div><div class="pill-label">Total Nitrogen</div><div class="pill-desc">overall increase</div></div>
+          <div class="stat-pill tp"><div class="pill-value">+53%</div><div class="pill-label">Total Phosphorus</div><div class="pill-desc">overall increase</div></div>
+          <div class="stat-pill secchi"><div class="pill-value">−51%</div><div class="pill-label">Secchi Depth</div><div class="pill-desc">~5 cm/yr loss</div></div>
+          <div class="stat-pill turb"><div class="pill-value">+43%</div><div class="pill-label">Turbidity</div><div class="pill-desc">overall increase</div></div>
+        </div>
+      </div>
+      <div class="scale-section">
+        <div class="scale-label">The more nutrients → the worse the water gets:</div>
+        <div class="scale-bar">
+          <div class="scale-seg clean">💧 Clean</div>
+          <div class="scale-seg murky">Getting Murky</div>
+          <div class="scale-seg algae">Lots of Algae!</div>
+          <div class="scale-seg danger">⚠️ DANGER!</div>
+        </div>
+      </div>
+      <div class="front-footer">
+        <span class="icon">⚠️</span>
+        <span class="msg">Signs of eutrophication and potential sedimentation</span>
+        <span class="flip-cta">See charts →</span>
+      </div>
+    </div>
+    <div class="card-back">
+      <div class="back-header">
+        <h2>McGee Creek Lake — Trend Charts</h2>
+        <span>Concentration over time</span>
+      </div>
+      <div class="chart-area">
+        <div class="chart-placeholder">
+          <span class="icon">📈</span>
+          <p>Replace this placeholder with your chart image.<br>
+          Add an <code>&lt;img src="YOUR_GITHUB_RAW_URL"&gt;</code> tag.</p>
+        </div>
+        <!-- REPLACE ABOVE with: <img src="https://raw.githubusercontent.com/YOUR_REPO/main/charts/McGeeCreek_Chlorophyll.png" alt="Chart"> -->
+      </div>
+      <div class="back-footer">
+        <div class="param-tabs">
+          <span class="param-tab active">Chlorophyll</span>
+          <span class="param-tab">Total N</span>
+          <span class="param-tab">Total P</span>
+          <span class="param-tab">Secchi</span>
+          <span class="param-tab">Turbidity</span>
+        </div>
+        <span class="flip-hint-back">← Back to summary</span>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="owrb-footer">Oklahoma Water Resources Board &nbsp;|&nbsp; WATER Division</p>
+</body>
+</html>
