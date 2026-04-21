@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Oklahoma's Lakes Under Pressure — OWRB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+:root{
+  --bg:#eef6f7;--surface:rgba(255,255,255,.82);--ink:#0f2a3a;--muted:#56717f;
+  --line:rgba(15,42,58,.12);--teal:#177e89;--teal-dark:#0f5f69;--teal-light:#e0f4f5;
+  --gold:#f4b942;--danger:#de5b48;--ok:#5a9b5f;
+  --shadow:0 20px 60px rgba(11,42,58,.12);--radius:24px;--max:1260px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:'DM Sans',sans-serif;color:var(--ink);
+  background:radial-gradient(circle at top left,rgba(47,159,218,.14),transparent 22%),
+             radial-gradient(circle at 90% 10%,rgba(244,185,66,.15),transparent 18%),
+             linear-gradient(180deg,#f3fafb 0%,#e8f3f4 100%)}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+button,input{font:inherit}
+.container{width:min(calc(100% - 32px),var(--max));margin:0 auto}
+.panel{background:var(--surface);border:1px solid rgba(255,255,255,.7);box-shadow:var(--shadow);border-radius:var(--radius);backdrop-filter:blur(14px)}
+
+/* ── TOPBAR ─────────────────────────────────────────────────────── */
+.topbar{position:sticky;top:0;z-index:1000;backdrop-filter:blur(18px);
+  background:rgba(15,42,58,.88);border-bottom:1px solid rgba(255,255,255,.08)}
+.topbar-inner{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:10px 0}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-logo{height:44px;width:auto;filter:brightness(0) invert(1)}
+.brand-text{display:flex;flex-direction:column}
+.brand-name{font-weight:800;font-size:1rem;color:#fff;line-height:1.1}
+.brand-sub{font-size:.75rem;color:rgba(255,255,255,.6);font-weight:500}
+.nav{display:flex;flex-wrap:wrap;gap:4px}
+.nav a{padding:8px 13px;border-radius:999px;color:rgba(255,255,255,.7);font-weight:700;font-size:.85rem;transition:all .2s}
+.nav a:hover{background:rgba(255,255,255,.12);color:#fff}
+
+/* ── HERO WITH IMAGE ─────────────────────────────────────────────── */
+.hero-banner{position:relative;height:420px;overflow:hidden}
+.hero-banner img{width:100%;height:100%;object-fit:cover;object-position:center 40%}
+.hero-banner-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(10,30,45,.35) 0%,rgba(10,30,45,.72) 60%,rgba(10,30,45,.92) 100%)}
+.hero-banner-content{
+  position:absolute;bottom:0;left:0;right:0;padding:40px;
+  display:flex;align-items:flex-end;justify-content:space-between;gap:32px;flex-wrap:wrap}
+.hero-title-block{}
+.hero-kicker{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;
+  border-radius:999px;background:rgba(23,126,137,.4);border:1px solid rgba(23,200,215,.3);
+  color:#7df0ff;font-size:.78rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px}
+.hero-h1{margin:0 0 10px;font-family:'Fraunces',serif;font-size:clamp(2.4rem,5vw,4.2rem);
+  line-height:.95;color:#fff;max-width:18ch}
+.hero-lead{margin:0;font-size:1rem;color:rgba(255,255,255,.78);max-width:52ch;line-height:1.65}
+.hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;
+  border-radius:14px;border:0;font-weight:800;cursor:pointer;font-size:.9rem;transition:all .2s}
+.btn-primary{background:linear-gradient(160deg,var(--teal),var(--teal-dark));color:#fff;
+  box-shadow:0 10px 28px rgba(23,126,137,.35)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(23,126,137,.45)}
+.btn-secondary{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);backdrop-filter:blur(8px)}
+.btn-secondary:hover{background:rgba(255,255,255,.25)}
+.hero-stats{display:flex;gap:24px;flex-wrap:wrap}
+.hero-stat{text-align:right;color:#fff}
+.hero-stat strong{display:block;font-size:2rem;font-family:'Fraunces',serif;color:var(--gold);line-height:1}
+.hero-stat span{font-size:.78rem;color:rgba(255,255,255,.65);font-weight:600}
+
+/* ── SECTIONS ────────────────────────────────────────────────────── */
+.section{padding:28px 0 14px}
+.section-head{margin-bottom:22px}
+.section-head .kicker{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;
+  border-radius:999px;background:rgba(23,126,137,.1);color:var(--teal-dark);
+  font-size:.75rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px}
+.section-head h2{font-family:'Fraunces',serif;font-size:clamp(2rem,4vw,2.9rem);margin:0 0 10px}
+.section-head p{max-width:64ch;line-height:1.7;color:var(--muted);margin:0}
+
+/* ── INFO CARDS (Eutrophication) ─────────────────────────────────── */
+.card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.info-card{padding:26px;border-radius:22px;background:rgba(255,255,255,.8);
+  border:1px solid rgba(255,255,255,.7);box-shadow:var(--shadow);
+  transition:transform .25s,box-shadow .25s;cursor:default}
+.info-card:hover{transform:translateY(-4px);box-shadow:0 28px 70px rgba(11,42,58,.16)}
+.icon{width:54px;height:54px;border-radius:16px;display:flex;align-items:center;
+  justify-content:center;margin-bottom:16px;background:rgba(23,126,137,.1);font-size:26px}
+.info-card h3{margin:0 0 10px;font-size:1.1rem}
+.info-card p,.info-card li{color:var(--muted);line-height:1.65;font-size:.95rem}
+.info-card ul{margin:10px 0 0;padding-left:18px}
+
+/* ── MONITOR / HABs GRID ─────────────────────────────────────────── */
+.monitor-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.monitor-panel{padding:26px;transition:transform .25s}
+.monitor-panel:hover{transform:translateY(-3px)}
+.timeline{display:grid;gap:12px;margin-top:14px}
+.timeline-item{padding:14px 16px;border-radius:16px;background:rgba(23,126,137,.06);
+  border:1px solid rgba(23,126,137,.1)}
+.timeline-item strong{display:block;margin-bottom:5px;font-size:.9rem}
+.timeline-item p,.timeline-item{font-size:.9rem;color:var(--muted);line-height:1.6}
+
+/* ── LEAFLET MAP ─────────────────────────────────────────────────── */
+.map-section-wrap{padding:26px 0}
+.map-panel-full{padding:28px}
+.map-layout{display:grid;grid-template-columns:1fr 340px;gap:28px;align-items:start}
+#leafletMap{height:480px;border-radius:20px;overflow:hidden;
+  box-shadow:0 12px 40px rgba(11,42,58,.18);border:1px solid var(--line)}
+.map-sidebar{}
+.map-sidebar h2{font-family:'Fraunces',serif;font-size:2rem;margin:0 0 10px}
+.map-sidebar p{color:var(--muted);line-height:1.7;font-size:.95rem;margin:0 0 18px}
+.legend{display:grid;gap:10px;margin-bottom:20px}
+.legend-item{display:flex;align-items:center;gap:12px;color:var(--muted);font-weight:700;font-size:.9rem}
+.legend-swatch{width:14px;height:14px;border-radius:50%;flex-shrink:0}
+.map-note{background:rgba(23,126,137,.07);border:1px solid rgba(23,126,137,.15);
+  border-radius:14px;padding:14px 16px;font-size:.83rem;color:var(--muted);line-height:1.6}
+
+/* Leaflet popup style overrides */
+.leaflet-popup-content-wrapper{border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.15);border:none}
+.leaflet-popup-content{margin:14px 16px;font-family:'DM Sans',sans-serif;font-size:.88rem;line-height:1.6}
+.popup-name{font-weight:800;font-size:1rem;color:var(--ink);margin-bottom:4px}
+.popup-county{color:var(--muted);font-size:.82rem}
+.popup-link{display:inline-block;margin-top:8px;padding:6px 12px;border-radius:8px;
+  background:var(--teal);color:#fff;font-weight:700;font-size:.8rem;cursor:pointer;border:none}
+.popup-link:hover{background:var(--teal-dark)}
+
+/* ── MONITORING SECTION ──────────────────────────────────────────── */
+.issue-grid,.action-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.issue-card,.action-card{padding:24px}
+.action-card{position:relative;overflow:hidden;transition:transform .25s}
+.action-card:hover{transform:translateY(-4px)}
+.action-number{position:absolute;top:14px;right:16px;font-size:3rem;font-weight:800;
+  color:rgba(23,126,137,.1);line-height:1}
+
+/* ── LAKE CARDS (flip) ───────────────────────────────────────────── */
+.toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:20px}
+.search{flex:1;min-width:260px}
+.search input{width:100%;padding:14px 18px;border-radius:16px;border:1.5px solid var(--line);
+  background:rgba(255,255,255,.9);font-size:.95rem;transition:border-color .2s,box-shadow .2s}
+.search input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(23,126,137,.15)}
+.filter-pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{padding:9px 14px;border-radius:999px;border:1.5px solid var(--line);
+  background:rgba(255,255,255,.85);color:var(--muted);font-weight:700;cursor:pointer;
+  font-size:.85rem;transition:all .2s}
+.pill.active{background:var(--teal-dark);color:#fff;border-color:transparent}
+.pill:hover:not(.active){border-color:var(--teal);color:var(--teal-dark)}
+
+.lake-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:22px}
+.flip-scene{perspective:1400px;min-height:480px}
+.flip-card{width:100%;min-height:480px;position:relative;transform-style:preserve-3d;
+  transition:transform .9s cubic-bezier(.2,.8,.2,1);cursor:pointer}
+.flip-scene.flipped .flip-card{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  border-radius:24px;overflow:hidden;box-shadow:var(--shadow);background:#fff;
+  border:1px solid rgba(255,255,255,.85);display:flex;flex-direction:column}
+.face.back{transform:rotateY(180deg)}
+
+/* Card front */
+.lake-head{padding:20px 22px 14px;background:#0f2a3a;color:#fff;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.lake-head h3{margin:0;font-size:1.3rem;line-height:1.2}
+.badge{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;
+  padding:6px 10px;border-radius:999px;white-space:nowrap;flex-shrink:0}
+.badge-gold{background:var(--gold);color:#0f2a3a}
+.badge-teal{background:#d6f0f2;color:#0f5f69}
+.lake-sub{padding:10px 22px;color:#51707b;background:#f4fbfb;
+  border-bottom:1px solid #dce9ea;font-size:.85rem}
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:18px}
+.stat-card{border:2px solid rgba(23,126,137,.2);border-radius:16px;padding:14px;
+  text-align:center;background:#fff;transition:border-color .2s,transform .2s}
+.stat-card:hover{border-color:rgba(23,126,137,.5);transform:scale(1.02)}
+.stat-card.highlight{border-color:rgba(244,185,66,.7);background:#fffaf1}
+.stat-card.highlight:hover{border-color:var(--gold)}
+.stat-value{font-size:1.85rem;font-weight:800;color:var(--teal)}
+.stat-value.negative{color:var(--danger)}
+.stat-label{margin-top:6px;font-size:.82rem;font-weight:800;color:var(--ink)}
+.stat-desc{margin-top:3px;color:#6c848d;font-size:.74rem}
+.warning-box{margin:0 18px 16px;background:#fff7e5;border:1.5px solid rgba(244,185,66,.7);
+  border-radius:16px;padding:12px 15px;font-weight:700;color:#946400;font-size:.88rem}
+.flip-hint{margin-top:auto;padding:0 18px 16px;color:#8aa2aa;font-size:.83rem;font-weight:700;
+  display:flex;align-items:center;gap:6px}
+.flip-hint::after{content:'↻';font-size:1rem}
+
+/* Card back */
+.face.back .lake-head{background:var(--teal)}
+.chart-area{flex:1;display:flex;align-items:center;justify-content:center;
+  padding:16px;background:#f6fbfb;min-height:200px}
+.chart-area img{width:100%;height:100%;object-fit:contain;border-radius:14px;
+  border:1px solid var(--line)}
+.chart-placeholder{text-align:center;color:var(--muted);font-size:.9rem;padding:24px}
+.chart-placeholder span{display:block;font-size:2.5rem;margin-bottom:8px}
+.back-footer{padding:12px 18px 16px;display:flex;justify-content:space-between;
+  align-items:center;border-top:1px solid #e1ebec;color:#6a818b;font-size:.83rem;font-weight:600}
+.back-close{background:rgba(23,126,137,.1);border:none;border-radius:8px;padding:6px 12px;
+  color:var(--teal-dark);font-weight:700;cursor:pointer;font-size:.82rem}
+.back-close:hover{background:rgba(23,126,137,.2)}
+
+/* ── RESOURCE CARDS ──────────────────────────────────────────────── */
+.resource-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.resource-card{padding:26px;text-decoration:none;display:block;
+  transition:transform .25s,box-shadow .25s;cursor:pointer}
+.resource-card:hover{transform:translateY(-5px);box-shadow:0 28px 70px rgba(11,42,58,.18)}
+.resource-card h3{margin:0 0 10px}
+.resource-card p{color:var(--muted);line-height:1.65;font-size:.93rem;margin:0 0 14px}
+.resource-arrow{display:inline-flex;align-items:center;gap:6px;color:var(--teal);font-weight:700;font-size:.88rem}
+
+/* ── FOOTER ──────────────────────────────────────────────────────── */
+.footer{padding:34px 0 60px;color:var(--muted)}
+.footer-box{padding:26px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.footer-logo{height:38px;width:auto;opacity:.7}
+
+/* ── SCROLL REVEAL ───────────────────────────────────────────────── */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .65s ease,transform .65s ease}
+.reveal.visible{opacity:1;transform:none}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────────── */
+@media(max-width:1080px){
+  .map-layout{grid-template-columns:1fr}
+  #leafletMap{height:380px}
+  .card-grid,.monitor-grid,.resource-grid{grid-template-columns:repeat(2,1fr)}
+  .issue-grid,.action-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:760px){
+  .topbar-inner{align-items:flex-start;flex-direction:column;gap:12px}
+  .nav{width:100%;overflow-x:auto;padding-bottom:4px}
+  .hero-banner{height:520px}
+  .hero-banner-content{flex-direction:column;align-items:flex-start;gap:20px}
+  .hero-stats{align-self:flex-start}
+  .card-grid,.monitor-grid,.resource-grid,.issue-grid,.action-grid{grid-template-columns:1fr}
+  .map-sidebar h2{font-size:1.5rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ── TOPBAR ──────────────────────────────────────────────────────── -->
+<header class="topbar">
+  <div class="container topbar-inner">
+    <div class="brand">
+      <img class="brand-logo"
+           src="https://raw.githubusercontent.com/OWRB/OWRB_Logo/main/OWRB_Logo.png"
+           alt="OWRB logo"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <!-- fallback badge if logo 404s -->
+      <div style="display:none;width:42px;height:42px;border-radius:12px;background:linear-gradient(160deg,#2f9fda,#177e89);align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:.85rem">OK</div>
+      <div class="brand-text">
+        <div class="brand-name">Oklahoma Water Resources Board</div>
+        <div class="brand-sub">WATER Division · Lakes Monitoring</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <a href="#intro">Intro</a>
+      <a href="#eutrophication">Eutrophication</a>
+      <a href="#habs">HABs</a>
+      <a href="#map">Map</a>
+      <a href="#monitoring">Monitoring</a>
+      <a href="#drivers">Why worse</a>
+      <a href="#actions">Act</a>
+      <a href="#lakes">Lakes</a>
+      <a href="#resources">Resources</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ── HERO BANNER ─────────────────────────────────────────────────── -->
+<div class="hero-banner" id="intro">
+  <img
+    src="https://raw.githubusercontent.com/OWRB/OWRB_Logo/main/Broken%20Bow-Edited.JPG"
+    alt="Broken Bow Lake, Oklahoma"
+    onerror="this.parentElement.style.background='linear-gradient(160deg,#0f2a3a,#177e89)';this.style.display='none'">
+  <div class="hero-banner-overlay"></div>
+  <div class="container hero-banner-content">
+    <div class="hero-title-block">
+      <div class="hero-kicker">🌊 Oklahoma Water Story</div>
+      <h1 class="hero-h1">Oklahoma's Lakes Under Pressure</h1>
+      <p class="hero-lead">Algae can turn an entire Oklahoma lake green — and make it dangerous to swim in. Explore the science, see where it's happening, and learn what you can do.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#lakes">Explore lake cards</a>
+        <a class="btn btn-secondary" href="#eutrophication">Learn the science</a>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><strong>136</strong><span>Oklahoma lakes<br>in this dataset</span></div>
+      <div class="hero-stat"><strong>20+</strong><span>Years of<br>monitoring data</span></div>
+      <div class="hero-stat"><strong>Flip</strong><span>Cards reveal<br>trend charts</span></div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+<!-- ── EUTROPHICATION ──────────────────────────────────────────────── -->
+<section class="section" id="eutrophication">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="kicker">Section 2</div>
+      <h2>What is eutrophication?</h2>
+      <p>When too many nutrients like nitrogen and phosphorus enter a lake, algae explodes — and the water suffers. Click each card to learn more.</p>
+    </div>
+    <div class="card-grid">
+      <article class="info-card reveal" onclick="expandCard(this)" style="cursor:pointer" aria-expanded="false">
+        <div class="icon">🧪</div>
+        <h3>The definition</h3>
+        <p>Eutrophication means nutrient enrichment. As the nutrient load grows, algae responds fast — water gets murkier, oxygen drops, and the lake becomes more stressed.</p>
+        <div class="card-extra" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">
+          <p><strong>Trophic states:</strong> Oligotrophic (clean) → Mesotrophic → Eutrophic → Hypereutrophic (dangerous). Most monitored Oklahoma lakes fall somewhere in the middle and are trending in the wrong direction.</p>
+        </div>
+        <div style="margin-top:14px;color:var(--teal);font-size:.83rem;font-weight:700">Tap to expand ↓</div>
+      </article>
+      <article class="info-card reveal" onclick="expandCard(this)" style="cursor:pointer">
+        <div class="icon">🚜</div>
+        <h3>Where nutrients come from</h3>
+        <ul>
+          <li>Farms and cropland — fertilizers and manure</li>
+          <li>Lawns, streets, and urban runoff</li>
+          <li>Sewage and septic systems</li>
+          <li>Atmospheric nitrogen deposition</li>
+        </ul>
+        <div class="card-extra" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">
+          <p>Oklahoma's heavily agricultural landscape means nutrient loading is a documented statewide concern. OWRB's long-term monitoring data tracks nutrient trends across 136 lakes.</p>
+        </div>
+        <div style="margin-top:14px;color:var(--teal);font-size:.83rem;font-weight:700">Tap to expand ↓</div>
+      </article>
+      <article class="info-card reveal" onclick="expandCard(this)" style="cursor:pointer">
+        <div class="icon">📉</div>
+        <h3>What it looks like</h3>
+        <p>Clear water shifts to murky water, green or brown coloration, surface scums, low oxygen — and eventually conditions that harm fish, wildlife, and people.</p>
+        <div class="card-extra" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">
+          <p>Key indicators measured by OWRB: chlorophyll-a, total phosphorus, total nitrogen, Secchi depth, and dissolved oxygen. All five together tell the eutrophication story for each lake.</p>
+        </div>
+        <div style="margin-top:14px;color:var(--teal);font-size:.83rem;font-weight:700">Tap to expand ↓</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ── HABs ────────────────────────────────────────────────────────── -->
+<section class="section" id="habs">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="kicker">Section 3</div>
+      <h2>Harmful algal blooms</h2>
+      <p>When nutrients get too high, blue-green algae can produce toxins dangerous to people, pets, fish, and wildlife.</p>
+    </div>
+    <div class="monitor-grid">
+      <article class="panel monitor-panel reveal">
+        <h3>🤒 Human health</h3>
+        <div class="timeline">
+          <div class="timeline-item"><strong>Risks</strong><p>Skin rashes, irritation, stomach cramps, nausea, and liver damage at high doses.</p></div>
+          <div class="timeline-item"><strong>Key rule</strong><p>Never drink bloom water. Keep pets and children out of visibly affected water.</p></div>
+        </div>
+      </article>
+      <article class="panel monitor-panel reveal">
+        <h3>🐟 Wildlife and nature</h3>
+        <div class="timeline">
+          <div class="timeline-item"><strong>Ecosystem effects</strong><p>Fish kills, oxygen depletion, aquatic plant die-off, and food-chain disruption.</p></div>
+          <div class="timeline-item"><strong>Common bloom formers in Oklahoma</strong><p>Microcystis, Dolichospermum, Aphanizomenon, Cylindrospermopsis.</p></div>
+        </div>
+      </article>
+      <article class="panel monitor-panel reveal">
+        <h3>💸 Communities and economy</h3>
+        <div class="timeline">
+          <div class="timeline-item"><strong>Community impacts</strong><p>Lakes can close for swimming, fishing tourism can drop, home values can fall, and water treatment costs can rise.</p></div>
+          <div class="timeline-item"><strong>Advisory source</strong><p>Check <a href="https://www.travelok.com/state-parks/lake-conditions" target="_blank" style="color:var(--teal);font-weight:700">OK Travel lake conditions</a> before visiting any Oklahoma lake.</p></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ── INTERACTIVE MAP ─────────────────────────────────────────────── -->
+<section class="map-section-wrap" id="map">
+  <div class="container">
+    <div class="panel map-panel-full reveal">
+      <div class="map-layout">
+        <div>
+          <div id="leafletMap"></div>
+        </div>
+        <div class="map-sidebar">
+          <div class="kicker">Section 3d</div>
+          <h2>Oklahoma lakes with monitoring data</h2>
+          <p>All 136 lakes in the OWRB dataset are shown. Click any marker to see the lake name and county. OWRB also monitors streams and groundwater statewide — nutrient pollution affects those systems differently.</p>
+          <div class="legend">
+            <div class="legend-item">
+              <span class="legend-swatch" style="background:#177e89"></span>Monitored lake
+            </div>
+            <div class="legend-item">
+              <span class="legend-swatch" style="background:#f4b942"></span>Selected / active
+            </div>
+          </div>
+          <div class="map-note">
+            <strong>HABs advisories</strong> are issued by ODEQ in partnership with OWRB and OCC. Check <a href="https://www.travelok.com/state-parks/lake-conditions" target="_blank" style="color:var(--teal);font-weight:700">OK Travel lake conditions</a> before visiting any Oklahoma lake.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── MONITORING ─────────────────────────────────────────────────── -->
+<section class="section" id="monitoring">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="kicker">Section 4</div>
+      <h2>How OWRB watches Oklahoma's lakes</h2>
+      <p>Three pillars: measuring water quality, supporting the state HABs partnership, and sharing the data publicly.</p>
+    </div>
+    <div class="monitor-grid">
+      <article class="panel monitor-panel reveal">
+        <h3>📊 Measuring water quality</h3>
+        <ul style="color:var(--muted);line-height:2;padding-left:18px;margin:12px 0 0">
+          <li>Chlorophyll-a levels</li>
+          <li>Total phosphorus and nitrogen</li>
+          <li>Dissolved oxygen profiles</li>
+          <li>Water clarity (Secchi depth)</li>
+          <li>Fixed and probabilistic sites</li>
+        </ul>
+      </article>
+      <article class="panel monitor-panel reveal">
+        <h3>🤝 HABs monitoring partnership</h3>
+        <div class="timeline">
+          <div class="timeline-item"><strong>Lead agency</strong><p>ODEQ leads statewide HABs monitoring.</p></div>
+          <div class="timeline-item"><strong>Partners</strong><p>OWRB and OCC contribute lake data and coordination. OWRB lake data informs public advisories.</p></div>
+        </div>
+      </article>
+      <article class="panel monitor-panel reveal">
+        <h3>🔓 Sharing the data</h3>
+        <ul style="color:var(--muted);line-height:2;padding-left:18px;margin:12px 0 0">
+          <li>AWQMS for discrete water quality data</li>
+          <li>Kister's for real-time information</li>
+          <li>Public data portal and downloads</li>
+          <li>Interactive maps and future dashboards</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ── WHY WORSE ──────────────────────────────────────────────────── -->
+<section class="section" id="drivers">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="kicker">Section 5</div>
+      <h2>Why is it getting worse?</h2>
+      <p>Climate change and land use patterns are making eutrophication and HABs more frequent and more severe.</p>
+    </div>
+    <div class="issue-grid">
+      <article class="panel issue-card reveal" onclick="expandCard(this)" style="cursor:pointer">
+        <h3>🌡️ Warmer waters</h3>
+        <p>Hotter summers give cyanobacteria a competitive edge — longer bloom seasons and earlier onset each year.</p>
+        <div class="card-extra" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">
+          <p>Warmer water also reduces dissolved oxygen, which can stress fish and other aquatic life even without a visible bloom.</p>
+        </div>
+        <div style="margin-top:12px;color:var(--teal);font-size:.8rem;font-weight:700">Tap to expand ↓</div>
+      </article>
+      <article class="panel issue-card reveal" onclick="expandCard(this)" style="cursor:pointer">
+        <h3>🌧️ Drought and flood cycles</h3>
+        <p>Drought concentrates nutrients in shrinking lakes. Then heavy rain delivers a sudden pulse of runoff — a double hit.</p>
+        <div class="card-extra" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">
+          <p>Oklahoma's increasing climate variability means these cycles are becoming more extreme, amplifying bloom risk in vulnerable lakes.</p>
+        </div>
+        <div style="margin-top:12px;color:var(--teal);font-size:.8rem;font-weight:700">Tap to expand ↓</div>
+      </article>
+      <article class="panel issue-card reveal" onclick="expandCard(this)" style="cursor:pointer">
+        <h3>🌾 Land use change</h3>
+        <p>More farmland and paved surfaces move more nutrients toward lakes, especially when natural vegetation buffers are removed.</p>
+        <div class="card-extra" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">
+          <p>Native vegetation along shorelines can filter significant amounts of nutrient runoff before it reaches the water. Loss of these buffers has measurable effects.</p>
+        </div>
+        <div style="margin-top:12px;color:var(--teal);font-size:.8rem;font-weight:700">Tap to expand ↓</div>
+      </article>
+      <article class="panel issue-card reveal" onclick="expandCard(this)" style="cursor:pointer">
+        <h3>⏳ Aging reservoirs</h3>
+        <p>Most Oklahoma reservoirs were built in the mid-1900s. Decades of nutrient buildup in sediments makes reversal harder over time.</p>
+        <div class="card-extra" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">
+          <p>Internal nutrient loading — nutrients released from lake bottom sediments — can sustain blooms even after surface inputs are reduced, making remediation a long-term effort.</p>
+        </div>
+        <div style="margin-top:12px;color:var(--teal);font-size:.8rem;font-weight:700">Tap to expand ↓</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ── WHAT YOU CAN DO ────────────────────────────────────────────── -->
+<section class="section" id="actions">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="kicker">Section 6</div>
+      <h2>What you can do</h2>
+      <p>Every person who visits, lives near, or uses Oklahoma's lakes can help.</p>
+    </div>
+    <div class="action-grid">
+      <article class="panel action-card reveal">
+        <div class="action-number">1</div>
+        <h3>👀 Spot a bloom</h3>
+        <p>Look for bright green or blue-green water, foamy surface scums, musty smells, or dead fish nearby.</p>
+      </article>
+      <article class="panel action-card reveal">
+        <div class="action-number">2</div>
+        <h3>🚫 Stay safe</h3>
+        <p>Do not swim in bloom water. Keep dogs and kids away from shoreline scums and avoid recreation in visibly affected areas.</p>
+      </article>
+      <article class="panel action-card reveal">
+        <div class="action-number">3</div>
+        <h3>🌱 Be part of the fix</h3>
+        <p>Use fertilizer wisely based on soil tests, plant shoreline buffers, pick up pet waste, and reduce lawn runoff.</p>
+      </article>
+      <article class="panel action-card reveal">
+        <div class="action-number">4</div>
+        <h3>📱 Stay informed</h3>
+        <p>Check <a href="https://www.travelok.com/state-parks/lake-conditions" target="_blank" style="color:var(--teal);font-weight:700">OK Travel lake conditions</a> before every visit. Report suspected blooms to ODEQ.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ── LAKE EXPLORER ──────────────────────────────────────────────── -->
+<section class="section" id="lakes">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="kicker">Lake explorer</div>
+      <h2>Flip-card lake library</h2>
+      <p>Click any card to flip it and reveal trend charts. Search and filter to find specific lakes.</p>
+    </div>
+    <div class="toolbar reveal">
+      <div class="search">
+        <input id="lakeSearch" type="search" placeholder="Search lake name, county, or keyword…">
+      </div>
+      <div class="filter-pills">
+        <button class="pill active" data-filter="all">All lakes</button>
+        <button class="pill" data-filter="sensitive">Sensitive water supply</button>
+        <button class="pill" data-filter="monitoring">Monitoring priority</button>
+      </div>
+    </div>
+    <div class="lake-grid" id="lakeGrid">
+
+      <!-- McGee Creek -->
+      <div class="flip-scene reveal" data-tags="mcgee creek chlorophyll sensitive water supply monitoring eutrophication atoka">
+        <div class="flip-card" tabindex="0" role="button" aria-label="Flip McGee Creek Lake card">
+          <div class="face front">
+            <div class="lake-head">
+              <div><h3>McGee Creek Reservoir</h3></div>
+              <span class="badge badge-gold">Sensitive water supply</span>
+            </div>
+            <div class="lake-sub">Eutrophication and sedimentation confirmed · 2001–2023</div>
+            <div class="stats-grid">
+              <div class="stat-card highlight">
+                <div class="stat-value">+230%</div>
+                <div class="stat-label">Chlorophyll-a</div>
+                <div class="stat-desc">overall increase</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">+41%</div>
+                <div class="stat-label">Total Nitrogen</div>
+                <div class="stat-desc">overall increase</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">+53%</div>
+                <div class="stat-label">Total Phosphorus</div>
+                <div class="stat-desc">overall increase</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value negative">−51%</div>
+                <div class="stat-label">Secchi Depth</div>
+                <div class="stat-desc">clarity loss</div>
+              </div>
+            </div>
+            <div class="warning-box">⚠️ Signs of eutrophication and potential sedimentation.</div>
+            <div class="flip-hint">Click to reveal trend chart</div>
+          </div>
+          <div class="face back">
+            <div class="lake-head">
+              <div><h3>McGee Creek Reservoir</h3></div>
+              <span class="badge badge-teal">Trend chart</span>
+            </div>
+            <div class="lake-sub">Chlorophyll-a annual concentration</div>
+            <div class="chart-area">
+              <img src="https://0011235813.github.io/Factsheets_HTML/McGeeCreek__Chlorophyll_trendline_with_dots.png"
+                   alt="McGee Creek chlorophyll trend chart"
+                   onerror="this.parentElement.innerHTML='<div class=chart-placeholder><span>📈</span>Chart image loads from OWRB GitHub.<br>Update the src path to match your repository.</div>'">
+            </div>
+            <div class="back-footer">
+              <span>Chlorophyll-a trend · McGee Creek</span>
+              <button class="back-close" onclick="event.stopPropagation();this.closest('.flip-scene').classList.remove('flipped')">← Back</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arbuckle (example template) -->
+      <div class="flip-scene reveal" data-tags="arbuckle reservoir monitoring priority murray county">
+        <div class="flip-card" tabindex="0" role="button" aria-label="Flip Arbuckle Reservoir card">
+          <div class="face front">
+            <div class="lake-head">
+              <div><h3>Arbuckle Reservoir</h3></div>
+              <span class="badge badge-teal">Monitoring priority</span>
+            </div>
+            <div class="lake-sub">Murray County · Long-term monitoring site</div>
+            <div class="stats-grid">
+              <div class="stat-card highlight">
+                <div class="stat-value">↑</div>
+                <div class="stat-label">Chlorophyll-a</div>
+                <div class="stat-desc">increasing trend</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">↑</div>
+                <div class="stat-label">Total Phosphorus</div>
+                <div class="stat-desc">increasing trend</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">↓</div>
+                <div class="stat-label">Secchi Depth</div>
+                <div class="stat-desc">declining clarity</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">96</div>
+                <div class="stat-label">Lakes</div>
+                <div class="stat-desc">same template</div>
+              </div>
+            </div>
+            <div class="warning-box">This template scales to all 136 monitored lakes — plug in real stats as data is processed.</div>
+            <div class="flip-hint">Click to reveal trend chart</div>
+          </div>
+          <div class="face back">
+            <div class="lake-head">
+              <div><h3>Arbuckle Reservoir</h3></div>
+              <span class="badge badge-teal">Trend chart</span>
+            </div>
+            <div class="lake-sub">Annual trend · coming soon</div>
+            <div class="chart-area">
+              <div class="chart-placeholder">
+                <span>📈</span>
+                Add chart image path here.<br>
+                <code style="font-size:.75rem;color:var(--muted)">Arbuckle__Chlorophyll_trendline_with_dots.png</code>
+              </div>
+            </div>
+            <div class="back-footer">
+              <span>Arbuckle Reservoir</span>
+              <button class="back-close" onclick="event.stopPropagation();this.closest('.flip-scene').classList.remove('flipped')">← Back</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /lake-grid -->
+  </div>
+</section>
+
+<!-- ── RESOURCES ──────────────────────────────────────────────────── -->
+<section class="section" id="resources">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="kicker">Section 7</div>
+      <h2>Learn more and take action</h2>
+      <p>Key resources for public information, data access, and agency contacts.</p>
+    </div>
+    <div class="resource-grid">
+      <a class="panel resource-card reveal" href="https://www.travelok.com/state-parks/lake-conditions" target="_blank">
+        <div class="icon">🏊</div>
+        <h3>OK Travel lake conditions</h3>
+        <p>Current safety information and lake advisory status before your visit.</p>
+        <div class="resource-arrow">Check advisories →</div>
+      </a>
+      <a class="panel resource-card reveal" href="https://oklahoma.gov/owrb/data-and-maps/monitoring-data.html" target="_blank">
+        <div class="icon">📊</div>
+        <h3>OWRB data portal</h3>
+        <p>Explore and download public water quality and quantity data for Oklahoma lakes, streams, and groundwater.</p>
+        <div class="resource-arrow">Explore data →</div>
+      </a>
+      <a class="panel resource-card reveal" href="https://oklahoma.gov/owrb/data-and-maps/beneficial-use-monitoring-program.html" target="_blank">
+        <div class="icon">🔬</div>
+        <h3>OWRB lakes monitoring</h3>
+        <p>Learn about the lakes, streams, and groundwater monitoring programs run by the OWRB WATER Division.</p>
+        <div class="resource-arrow">Learn more →</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ── FOOTER ─────────────────────────────────────────────────────── -->
+<footer class="footer">
+  <div class="container">
+    <div class="panel footer-box reveal visible">
+      <div>
+        <img class="footer-logo"
+             src="https://raw.githubusercontent.com/OWRB/OWRB_Logo/main/OWRB_Logo.png"
+             alt="OWRB logo"
+             onerror="this.style.display='none'">
+        <div style="margin-top:10px;max-width:64ch;line-height:1.7;font-size:.93rem">
+          This project was funded by the U.S. Environmental Protection Agency through Section 604(b) of the Clean Water Act.
+          Grant No. FY-19 604(b) C6-40000057. Oklahoma Water Resources Board, WATER Division.
+        </div>
+      </div>
+      <div style="font-size:.93rem;line-height:1.8;color:var(--muted)">
+        Oklahoma Water Resources Board<br>
+        WATER Division<br>
+        3800 N Classen Blvd, Oklahoma City, OK 73118<br>
+        <a href="https://oklahoma.gov/owrb" style="color:var(--teal);font-weight:700">oklahoma.gov/owrb</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ── LEAFLET JS ──────────────────────────────────────────────────── -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" onload="initMap()"></script>
+
+<script>
+// ── LAKE GEO DATA (from CSV) ───────────────────────────────────────
+const LAKES = [{"name":"Altus Reservoir","lat":34.92359,"lon":-99.29111,"county":"Greer"},{"name":"American Horse Lake","lat":35.6287,"lon":-98.506811,"county":"Blaine"},{"name":"Arbuckle Reservoir","lat":34.466564,"lon":-97.038078,"county":"Murray"},{"name":"Arcadia Lake","lat":35.615944,"lon":-97.4059,"county":"Oklahoma"},{"name":"Ardmore City Lake","lat":34.223067,"lon":-97.154667,"county":"Carter"},{"name":"Atoka Lake","lat":34.540172,"lon":-96.046244,"county":"Atoka"},{"name":"Bellcow Lake","lat":35.731678,"lon":-96.918081,"county":"Lincoln"},{"name":"Birch Lake","lat":36.524503,"lon":-96.174067,"county":"Osage"},{"name":"Bixhoma Lake","lat":35.889581,"lon":-95.794761,"county":"Wagoner"},{"name":"Bluestem Lake","lat":36.715794,"lon":-96.427997,"county":"Osage"},{"name":"Boomer Lake","lat":36.151317,"lon":-97.063589,"county":"Payne"},{"name":"Broken Bow Lake","lat":34.262222,"lon":-94.683056,"county":"Mccurtain"},{"name":"Brooks Lake","lat":35.17828,"lon":-96.18269,"county":"Hughes"},{"name":"Brown Lake","lat":34.83072,"lon":-95.86696,"county":"Pittsburg"},{"name":"Brushy Creek Reservoir","lat":35.535278,"lon":-94.826944,"county":"Sequoyah"},{"name":"Canton Lake","lat":36.093372,"lon":-98.588339,"county":"Blaine"},{"name":"Carl Albert Lake","lat":34.767789,"lon":-95.068258,"county":"Latimer"},{"name":"Carter Lake","lat":34.129575,"lon":-96.805081,"county":"Marshall"},{"name":"Cedar (Mena) Lake","lat":34.781753,"lon":-94.696917,"county":"Le Flore"},{"name":"Chandler Lake","lat":35.741231,"lon":-96.907247,"county":"Lincoln"},{"name":"Chelsea Reservoir","lat":36.54363,"lon":-95.4648,"county":"Rogers"},{"name":"Claremore","lat":36.325136,"lon":-95.579578,"county":"Rogers"},{"name":"Clayton Lake","lat":34.54279,"lon":-95.30897,"county":"Pushmataha"},{"name":"Clear Creek Lake","lat":34.585278,"lon":-97.840833,"county":"Stephens"},{"name":"Cleveland City Lake","lat":36.282086,"lon":-96.581317,"county":"Pawnee"},{"name":"Clinton Lake","lat":35.431257,"lon":-99.220936,"county":"Washita"},{"name":"Coalgate City Lake","lat":34.57175,"lon":-96.233131,"county":"Coal"},{"name":"Comanche Lake","lat":34.376275,"lon":-97.890092,"county":"Stephens"},{"name":"Copan Lake","lat":36.926219,"lon":-95.952817,"county":"Washington"},{"name":"Crowder Lake","lat":35.407472,"lon":-98.710431,"county":"Washita"},{"name":"Cushing  Municipal Lake","lat":35.991225,"lon":-96.871831,"county":"Payne"},{"name":"Dripping Springs Lake","lat":35.559769,"lon":-96.111022,"county":"Okmulgee"},{"name":"Duncan Lake","lat":34.519869,"lon":-97.815278,"county":"Stephens"},{"name":"Elk City Lake","lat":35.361383,"lon":-99.410417,"county":"Beckham"},{"name":"Elmer Lake","lat":35.88008,"lon":-97.98804,"county":""},{"name":"Elmer Thomas Lake","lat":34.725258,"lon":-98.520411,"county":""},{"name":"Eucha Lake","lat":36.350472,"lon":-94.814033,"county":"Delaware"},{"name":"Eufaula Lake","lat":35.233919,"lon":-95.49991,"county":"Haskell"},{"name":"Fairfax Lake","lat":36.611714,"lon":-96.734278,"county":"Osage"},{"name":"Fort Cobb Reservoir","lat":35.219481,"lon":-98.509489,"county":"Caddo"},{"name":"Fort Gibson Lake","lat":36.031111,"lon":-95.311389,"county":"Cherokee"},{"name":"Fort Supply Lake","lat":36.548517,"lon":-99.565136,"county":"Woodward"},{"name":"Foss Reservoir","lat":35.539364,"lon":-99.189006,"county":"Custer"},{"name":"Fuqua Lake","lat":34.617222,"lon":-97.688056,"county":"Stephens"},{"name":"Grand Lake","lat":36.563056,"lon":-94.769167,"county":"Mayes"},{"name":"Great Salt Plains Lake","lat":36.743033,"lon":-98.156006,"county":"Alfalfa"},{"name":"Greenleaf Lake","lat":35.630169,"lon":-95.159978,"county":"Muskogee"},{"name":"Guthrie Lake","lat":35.818886,"lon":-97.43885,"county":"Logan"},{"name":"Healdton Lake","lat":34.236464,"lon":-97.449992,"county":"Carter"},{"name":"Hefner Lake","lat":35.575421,"lon":-97.589619,"county":"Oklahoma"},{"name":"Heyburn Lake","lat":35.948419,"lon":-96.3118,"county":"Creek"},{"name":"Holdenville Lake","lat":35.040467,"lon":-96.344928,"county":"Hughes"},{"name":"Hominy Lake","lat":36.408811,"lon":-96.415092,"county":"Osage"},{"name":"Hudson Lake","lat":36.820481,"lon":-96.045575,"county":"Osage"},{"name":"Hugo Lake","lat":34.084953,"lon":-95.431139,"county":"Choctaw"},{"name":"Hulah Lake","lat":36.953897,"lon":-96.107189,"county":"Osage"},{"name":"Humphreys Lake","lat":34.598611,"lon":-97.902778,"county":"Stephens"},{"name":"John Wells Lake","lat":35.231144,"lon":-95.088494,"county":"Haskell"},{"name":"Kaw Lake","lat":36.790381,"lon":-96.907986,"county":"Osage"},{"name":"Keystone Lake","lat":36.193875,"lon":-96.391578,"county":"Tulsa"},{"name":"Lake Carl Blackwell","lat":36.135719,"lon":-97.231956,"county":"Payne"},{"name":"Lake Chickasha","lat":35.135586,"lon":-98.140212,"county":"Caddo"},{"name":"Lake El Reno","lat":35.527264,"lon":-97.986875,"county":"Canadian"},{"name":"Lake Ellsworth","lat":34.817625,"lon":-98.339705,"county":"Comanche"},{"name":"Lake Etling","lat":36.849558,"lon":-102.868567,"county":"Cimarron"},{"name":"Lake Frederick","lat":34.542636,"lon":-98.8815,"county":"Tillman"},{"name":"Lake Henryetta","lat":35.393879,"lon":-95.934236,"county":"Okmulgee"},{"name":"Lake Hudson","lat":36.384866,"lon":-95.108341,"county":"Mayes"},{"name":"Lake Jean Neustadt","lat":34.295367,"lon":-97.162647,"county":"Carter"},{"name":"Lake Konawa","lat":34.957619,"lon":-96.726661,"county":"Seminole"},{"name":"Lake Lawtonka","lat":34.760511,"lon":-98.507839,"county":"Comanche"},{"name":"Lake Louis Burtschi","lat":34.964742,"lon":-98.064144,"county":"Grady"},{"name":"Lake McAlester","lat":35.018469,"lon":-95.804356,"county":"Pittsburg"},{"name":"Lake McMurtry","lat":36.196226,"lon":-97.199847,"county":"Noble"},{"name":"Lake Murray","lat":34.118889,"lon":-97.105,"county":"Love"},{"name":"Lake Nanih Waiya","lat":34.631242,"lon":-95.299314,"county":"Pushmataha"},{"name":"Lake Overholser","lat":35.487161,"lon":-97.668244,"county":"Oklahoma"},{"name":"Lake Ozzie Cobb","lat":34.246222,"lon":-95.387464,"county":"Pushmataha"},{"name":"Lake Pawhuska","lat":36.650842,"lon":-96.397917,"county":"Osage"},{"name":"Lake Ponca","lat":36.721492,"lon":-97.025436,"county":"Kay"},{"name":"Lake Raymond Gary","lat":33.991769,"lon":-95.259231,"county":"Choctaw"},{"name":"Lake Sahoma","lat":36.029922,"lon":-96.152269,"county":"Creek"},{"name":"Lake Stanley Draper","lat":35.327661,"lon":-97.351253,"county":"Cleveland"},{"name":"Lake Texoma","lat":33.942519,"lon":-96.907375,"county":"Marshall"},{"name":"Lake Thunderbird","lat":35.231667,"lon":-97.305556,"county":"Cleveland"},{"name":"Lake Vanderwork","lat":35.171822,"lon":-98.830539,"county":"Washita"},{"name":"Lake Vincent","lat":36.056672,"lon":-99.916445,"county":"Ellis"},{"name":"Lake Wayne Wallace","lat":34.993027,"lon":-95.356202,"county":"Latimer"},{"name":"Langston Lake","lat":35.914373,"lon":-97.274764,"county":"Logan"},{"name":"Liberty Lake","lat":35.804328,"lon":-97.4667,"county":"Logan"},{"name":"Lloyd Church","lat":34.881656,"lon":-95.336564,"county":"Latimer"},{"name":"Lone Chimney Lake","lat":36.255375,"lon":-96.825731,"county":"Pawnee"},{"name":"McGee Creek Reservoir","lat":34.359761,"lon":-95.870411,"county":"Atoka"},{"name":"Meeker Lake","lat":35.497461,"lon":-96.936797,"county":"Lincoln"},{"name":"Mountain Lake","lat":34.36622,"lon":-97.28484,"county":"Carter"},{"name":"New Spiro Lake","lat":35.193536,"lon":-94.616222,"county":"Le Flore"},{"name":"Okemah Lake","lat":35.508911,"lon":-96.323119,"county":"Okfuskee"},{"name":"Okmulgee Lake","lat":35.623444,"lon":-96.073845,"county":"Okmulgee"},{"name":"Oologah Lake","lat":36.603967,"lon":-95.565636,"county":"Rogers"},{"name":"Pauls Valley City Lake","lat":34.769386,"lon":-97.204419,"county":"Garvin"},{"name":"Pawnee Lake","lat":36.37324,"lon":-96.800534,"county":"Pawnee"},{"name":"Perry Lake","lat":36.242433,"lon":-97.340869,"county":"Noble"},{"name":"Pine Creek Lake","lat":34.16255,"lon":-95.11005,"county":"Mccurtain"},{"name":"Prague City Lake","lat":35.531339,"lon":-96.722683,"county":"Lincoln"},{"name":"Purcell Lake","lat":34.993214,"lon":-97.377867,"county":"Mcclain"},{"name":"RC Longmire Lake","lat":34.75152,"lon":-97.051084,"county":"Garvin"},{"name":"Robert S. Kerr Reservoir","lat":35.407047,"lon":-94.965331,"county":"Sequoyah"},{"name":"Rock Creek Reservoir","lat":34.257444,"lon":-97.179964,"county":"Carter"},{"name":"Rocky Lake","lat":35.183122,"lon":-99.073808,"county":"Washita"},{"name":"Sardis Lake","lat":34.679075,"lon":-95.334831,"county":"Pushmataha"},{"name":"Shawnee Twin #1 Lake","lat":35.327589,"lon":-97.073414,"county":"Pottawatomie"},{"name":"Shawnee Twin #2 Lake","lat":35.357803,"lon":-97.083297,"county":"Pottawatomie"},{"name":"Shell Lake","lat":36.186383,"lon":-96.167044,"county":"Osage"},{"name":"Skiatook Lake","lat":36.385719,"lon":-96.233839,"county":"Osage"},{"name":"Sooner Reservoir","lat":36.417306,"lon":-97.057256,"county":"Pawnee"},{"name":"Spavinaw Lake","lat":36.382919,"lon":-95.046614,"county":"Mayes"},{"name":"Sportsman Lake","lat":35.213453,"lon":-96.556689,"county":"Seminole"},{"name":"Stilwell City Lake","lat":35.763475,"lon":-94.706228,"county":"Adair"},{"name":"Stroud Lake","lat":35.814703,"lon":-96.620942,"county":"Creek"},{"name":"Talawanda Lake #1","lat":34.975206,"lon":-95.788492,"county":"Pittsburg"},{"name":"Talawanda Lake #2","lat":34.984594,"lon":-95.794008,"county":"Pittsburg"},{"name":"Taylor (Marlow) Lake","lat":34.750483,"lon":-97.927836,"county":"Grady"},{"name":"Tecumseh Lake","lat":35.286489,"lon":-96.962497,"county":"Pottawatomie"},{"name":"Tenkiller Ferry Lake","lat":35.674433,"lon":-94.976408,"county":"Sequoyah"},{"name":"Tom Steed Reservoir","lat":34.782683,"lon":-98.992947,"county":"Kiowa"},{"name":"WR Holway","lat":36.252091,"lon":-95.093118,"county":"Mayes"},{"name":"Walters (Dave Boyer) Lake","lat":34.376239,"lon":-98.334631,"county":"Cotton"},{"name":"Waurika Lake","lat":34.301625,"lon":-98.110581,"county":"Jefferson"},{"name":"Waxhoma Lake","lat":36.557828,"lon":-96.109639,"county":"Osage"},{"name":"Webbers Falls Reservoir","lat":35.630556,"lon":-95.271667,"county":"Muskogee"},{"name":"Weleetka","lat":35.33544,"lon":-96.16399,"county":"Okfuskee"},{"name":"Wes Watkins Reservoir","lat":35.402592,"lon":-97.098186,"county":"Pottawatomie"},{"name":"Wetumka Lake","lat":35.284675,"lon":-96.246731,"county":"Hughes"},{"name":"Wewoka Lake","lat":35.189978,"lon":-96.522382,"county":"Seminole"},{"name":"Wiley Post Memorial (Maysville) Lake","lat":34.865206,"lon":-97.387188,"county":"Mcclain"},{"name":"Wister Lake","lat":34.940133,"lon":-94.724117,"county":"Le Flore"}];
+
+// ── LEAFLET MAP ────────────────────────────────────────────────────
+function initMap() {
+const map = L.map('leafletMap', {
+  center: [35.5, -97.5],
+  zoom: 7,
+  zoomControl: true,
+  scrollWheelZoom: false
+});
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  attribution: '© <a href="https://carto.com">CARTO</a> © <a href="https://openstreetmap.org">OSM</a>',
+  maxZoom: 18
+}).addTo(map);
+
+// Custom marker icon
+function makeIcon(color) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="
+      width:14px;height:14px;border-radius:50%;
+      background:${color};border:2.5px solid #fff;
+      box-shadow:0 2px 8px rgba(0,0,0,.25);
+      transition:transform .15s;
+    "></div>`,
+    iconSize: [14, 14],
+    iconAnchor: [7, 7],
+    popupAnchor: [0, -10]
+  });
+}
+
+const tealIcon = makeIcon('#177e89');
+const goldIcon = makeIcon('#f4b942');
+
+LAKES.forEach(lake => {
+  const marker = L.marker([lake.lat, lake.lon], { icon: tealIcon })
+    .addTo(map)
+    .bindPopup(`
+      <div class="popup-name">${lake.name}</div>
+      <div class="popup-county">${lake.county ? lake.county + ' County' : 'Oklahoma'}</div>
+      <button class="popup-link" onclick="scrollToLake('${lake.name.replace(/'/g,"\\'")}')">View lake card ↓</button>
+    `, { maxWidth: 220 });
+
+  marker.on('mouseover', function() {
+    this.setIcon(goldIcon);
+  });
+  marker.on('mouseout', function() {
+    if (!this.isPopupOpen()) this.setIcon(tealIcon);
+  });
+  marker.on('popupclose', function() {
+    this.setIcon(tealIcon);
+  });
+});
+
+} // end initMap()
+
+function scrollToLake(name) {
+  const section = document.getElementById('lakes');
+  if (section) section.scrollIntoView({ behavior: 'smooth' });
+  const search = document.getElementById('lakeSearch');
+  if (search) {
+    search.value = name.split(' ')[0];
+    search.dispatchEvent(new Event('input'));
+  }
+  document.querySelector('.leaflet-popup-close-button') && document.querySelector('.leaflet-popup-close-button').click();
+}
+
+// ── FLIP CARDS ─────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+document.querySelectorAll('.flip-scene').forEach(scene => {
+  const card = scene.querySelector('.flip-card');
+  const toggle = () => scene.classList.toggle('flipped');
+  card.addEventListener('click', toggle);
+  card.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+  });
+});
+
+// ── EXPAND CARDS (info / issue cards) ─────────────────────────────
+function expandCard(el) {
+  const extra = el.querySelector('.card-extra');
+  const hint = el.querySelector('[style*="Tap to expand"]');
+  if (!extra) return;
+  const open = extra.style.display !== 'none';
+  extra.style.display = open ? 'none' : 'block';
+  if (hint) hint.textContent = open ? 'Tap to expand ↓' : 'Tap to collapse ↑';
+  el.setAttribute('aria-expanded', !open);
+}
+
+// ── SEARCH + FILTER ────────────────────────────────────────────────
+const searchInput = document.getElementById('lakeSearch');
+const pills = document.querySelectorAll('.pill');
+const cards = document.querySelectorAll('#lakeGrid .flip-scene');
+let activeFilter = 'all';
+
+function filterCards() {
+  const q = searchInput.value.toLowerCase().trim();
+  cards.forEach(card => {
+    const tags = (card.dataset.tags || '').toLowerCase();
+    const matchesSearch = !q || tags.includes(q);
+    const matchesFilter = activeFilter === 'all' || tags.includes(activeFilter);
+    card.style.display = matchesSearch && matchesFilter ? '' : 'none';
+  });
+}
+
+searchInput.addEventListener('input', filterCards);
+pills.forEach(pill => {
+  pill.addEventListener('click', () => {
+    pills.forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    activeFilter = pill.dataset.filter;
+    filterCards();
+  });
+});
+
+// ── SCROLL REVEAL ──────────────────────────────────────────────────
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) entry.target.classList.add('visible');
+  });
+}, { threshold: 0.1 });
+revealEls.forEach(el => io.observe(el));
+}); // end DOMContentLoaded
+</script>
+</body>
+</html>
