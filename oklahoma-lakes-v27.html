@@ -527,6 +527,13 @@ button,input{font:inherit}
 .rback-chart-view{flex:1!important;min-height:0!important;overflow:hidden!important}
 .rback-body{flex:1!important;min-height:0!important;overflow:hidden!important}
 .rback-footer{flex-shrink:0!important;margin-top:auto}
+
+.modal-empty{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:60px 20px;text-align:center;}
+.modal-param-header{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.modal-param-header h4{margin:0;font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#374151;}
+.modal-dir-badge{font-size:.78rem;font-weight:800;white-space:nowrap;}
+.modal-tsi-sub{font-size:.75rem;color:#6b7280;font-weight:600;}
 </style>
 </head>
 <body>
@@ -1298,53 +1305,92 @@ function buildGauge(lakeKey, tsi) {
 
 
 
-function openAllChartsModal(lakeKey, info) {
-  const tsi=TSI_DATA[lakeKey]||null, p=info.p;
-  document.getElementById('modalLakeName').textContent=info.name;
-  document.getElementById('modalCounty').textContent=info.county?info.county+' County':'';
-  const tsiBar=document.getElementById('modalTsiBar');
-  if(tsi){
-    tsiBar.style.display='flex';
-    tsiBar.innerHTML=`<div class="modal-tsi-pill" style="border-color:${tsi.color}">
-      <div class="modal-tsi-dot" style="background:${tsi.color}">${tsi.tsi_avg}</div>
-      <div><div style="color:${tsi.color};font-weight:800">${tsi.category}</div>
-      <div style="font-size:.78rem;color:#374151">Carlson TSI &nbsp;·&nbsp; Most recent year</div></div></div>
-      ${tsi.tsi_chl!=null?`<span style="font-size:.75rem;color:#6b7280;font-weight:600">Chl-a: <b>${tsi.tsi_chl}</b></span>`:''}
-      ${tsi.tsi_sec!=null?`<span style="font-size:.75rem;color:#6b7280;font-weight:600">Secchi: <b>${tsi.tsi_sec}</b></span>`:''}
-      ${tsi.tsi_tp!=null?`<span style="font-size:.75rem;color:#6b7280;font-weight:600">Phos: <b>${tsi.tsi_tp}</b></span>`:''}`;
-  } else { tsiBar.style.display='none'; }
-  const grid=document.getElementById('modalChartsGrid');
-  grid.innerHTML='';
-  PO.forEach(k=>{
-    const d=p[k],m=PM[k];
-    const panel=document.createElement('div');
-    panel.className='modal-chart-panel';
-    if(!d||!d.sig||!d.tpts||d.tpts.length<2){
-      panel.innerHTML=`<h4>${m.label}</h4><div class="modal-no-data">No significant trend detected</div>`;
-    } else {
-      const pct=(!d.pct||d.pct==='NS')?'\u2014':d.pct;
-      let dir='';
-      if(d.dir&&d.dir!=='ns'&&d.dir!=='nan'&&d.dir!==''){
-        dir=k==='sec'?(d.dir==='down'?'\u2193 Declining clarity':'\u2191 Improving clarity'):(d.dir==='up'?'\u2191 Increasing':'\u2193 Decreasing');
-      }
-      panel.innerHTML=`<h4>${m.label}</h4>
-        <div class="modal-stat">${d.by}\u2013${d.ey} &nbsp;\u00b7&nbsp; Change: ${pct} &nbsp;\u00b7&nbsp; ${dir}</div>
-        <canvas style="height:180px;display:block"></canvas>`;
-      requestAnimationFrame(()=>requestAnimationFrame(()=>{
-        const cv=panel.querySelector('canvas');
-        cv.style.height='180px';
-        drawChart(cv,k,d);
-      }));
-    }
-    grid.appendChild(panel);
-  });
-  document.getElementById('allChartsModal').classList.add('open');
-  document.body.style.overflow='hidden';
-}
+
+let _modalWired = false;
 function closeAllChartsModal(){
   document.getElementById('allChartsModal').classList.remove('open');
   document.body.style.overflow='';
 }
+function openAllChartsModal(lakeKey, info) {
+  // Wire close handlers once
+  if(!_modalWired){
+    _modalWired=true;
+    document.getElementById('modalCloseBtn').addEventListener('click', closeAllChartsModal);
+    document.getElementById('allChartsModal').addEventListener('click', function(e){ if(e.target===this) closeAllChartsModal(); });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeAllChartsModal(); });
+  }
+  const tsi=TSI_DATA[lakeKey]||null, p=info.p;
+  document.getElementById('modalLakeName').textContent=info.name;
+  document.getElementById('modalCounty').textContent=info.county?info.county+' County':'';
+
+  // TSI bar
+  const tsiBar=document.getElementById('modalTsiBar');
+  if(tsi){
+    tsiBar.style.display='flex';
+    tsiBar.innerHTML=`
+      <div class="modal-tsi-pill" style="border-color:${tsi.color}">
+        <div class="modal-tsi-dot" style="background:${tsi.color}">${tsi.tsi_avg}</div>
+        <div>
+          <div style="color:${tsi.color};font-weight:800">${tsi.category}</div>
+          <div style="font-size:.78rem;color:#374151">Carlson TSI &nbsp;&middot;&nbsp; Most recent year</div>
+        </div>
+      </div>
+      ${tsi.tsi_chl!=null?`<span class="modal-tsi-sub">Chl-a TSI: <b>${tsi.tsi_chl}</b></span>`:''}
+      ${tsi.tsi_sec!=null?`<span class="modal-tsi-sub">Secchi TSI: <b>${tsi.tsi_sec}</b></span>`:''}
+      ${tsi.tsi_tp !=null?`<span class="modal-tsi-sub">Phos TSI: <b>${tsi.tsi_tp}</b></span>`:''}`;
+  } else { tsiBar.style.display='none'; }
+
+  // Only show params with significant trends
+  const sigParams = PO.filter(k => p[k] && p[k].sig && p[k].tpts && p[k].tpts.length >= 2);
+  const grid = document.getElementById('modalChartsGrid');
+  grid.innerHTML = '';
+
+  if(sigParams.length === 0){
+    grid.innerHTML = `<div class="modal-empty">
+      <div style="font-size:2.5rem;margin-bottom:12px">📊</div>
+      <div style="font-size:1rem;font-weight:700;color:#374151;margin-bottom:6px">No Significant Trends Detected</div>
+      <div style="font-size:.88rem;color:#6b7280;line-height:1.6;max-width:36ch">This lake has been monitored but none of the parameters show a statistically significant trend over the period of record.</div>
+    </div>`;
+  } else {
+    // Update subtitle with count
+    document.getElementById('modalCounty').textContent =
+      (info.county ? info.county + ' County' : '') +
+      `  ·  ${sigParams.length} significant trend${sigParams.length!==1?'s':''}`;
+
+    sigParams.forEach(k => {
+      const d=p[k], m=PM[k];
+      const pct=(!d.pct||d.pct==='NS')?'\u2014':d.pct;
+      let dir='', dirColor='#374151';
+      if(d.dir&&d.dir!=='ns'&&d.dir!=='nan'&&d.dir!==''){
+        if(k==='sec'){
+          dir=d.dir==='down'?'\u2193 Declining clarity':'\u2191 Improving clarity';
+          dirColor=d.dir==='down'?'#b71c1c':'#1b5e20';
+        } else {
+          dir=d.dir==='up'?'\u2191 Increasing':'\u2193 Decreasing';
+          dirColor=d.dir==='up'?'#b71c1c':'#1b5e20';
+        }
+      }
+      const panel=document.createElement('div');
+      panel.className='modal-chart-panel';
+      panel.innerHTML=`
+        <div class="modal-param-header">
+          <h4>${m.label}</h4>
+          <span class="modal-dir-badge" style="color:${dirColor}">${dir}</span>
+        </div>
+        <div class="modal-stat">${d.by}&ndash;${d.ey} &nbsp;&middot;&nbsp; Overall change: <b>${pct}</b></div>
+        <canvas style="height:190px;display:block;margin-top:4px"></canvas>`;
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        const cv=panel.querySelector('canvas');
+        cv.style.height='190px';
+        drawChart(cv,k,d);
+      }));
+      grid.appendChild(panel);
+    });
+  }
+  document.getElementById('allChartsModal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
 
 function buildCard(lakeKey,info){
   const el=document.createElement('div');
@@ -1486,12 +1532,6 @@ pills.forEach(p=>p.addEventListener('click',()=>{
   </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded',function(){
-  document.getElementById('modalCloseBtn').addEventListener('click',closeAllChartsModal);
-  document.getElementById('allChartsModal').addEventListener('click',function(e){if(e.target===this)closeAllChartsModal();});
-  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeAllChartsModal();});
-});
-</script>
+
 </body>
 </html>
