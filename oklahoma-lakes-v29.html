@@ -509,10 +509,17 @@ button,input{font:inherit}
   padding:6px 14px 6px 8px;border:2px solid;font-weight:700;font-size:.82rem;}
 .modal-tsi-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;
   justify-content:center;color:#fff;font-size:.75rem;font-weight:900;}
-.modal-body{flex:1;min-height:0;overflow-y:auto;padding:20px 24px 24px;
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;}
-.modal-chart-panel{background:#f8fafc;border-radius:14px;padding:14px 14px 10px;
-  border:1px solid #e2e8f0;display:flex;flex-direction:column;gap:6px;}
+.modal-body{flex:1;min-height:0;overflow:hidden;padding:0;display:flex;flex-direction:column;}
+.modal-carousel{display:flex;gap:0;overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+  flex:1;min-height:0;padding:20px 24px;gap:20px;
+  scrollbar-width:thin;scrollbar-color:var(--teal,#0066A6) #e2e8f0;}
+.modal-carousel::-webkit-scrollbar{height:6px;}
+.modal-carousel::-webkit-scrollbar-track{background:#e2e8f0;border-radius:999px;}
+.modal-carousel::-webkit-scrollbar-thumb{background:var(--teal,#0066A6);border-radius:999px;}
+.modal-chart-panel{background:#f8fafc;border-radius:14px;padding:16px 16px 12px;
+  border:1px solid #e2e8f0;display:flex;flex-direction:column;gap:6px;
+  flex:0 0 380px;scroll-snap-align:start;height:calc(100% - 4px);box-sizing:border-box;}
 .modal-chart-panel h4{margin:0;font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#374151;}
 .modal-stat{font-size:.72rem;color:#6b7280;font-weight:600;margin-top:2px;}
 .modal-no-data{color:#9ca3af;font-size:.8rem;font-weight:600;
@@ -528,7 +535,7 @@ button,input{font:inherit}
 .rback-body{flex:1!important;min-height:0!important;overflow:hidden!important}
 .rback-footer{flex-shrink:0!important;margin-top:auto}
 
-.modal-empty{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;
+.modal-empty{min-width:100%;display:flex;flex-direction:column;align-items:center;
   justify-content:center;padding:60px 20px;text-align:center;}
 .modal-param-header{display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .modal-param-header h4{margin:0;font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#374151;}
@@ -1173,22 +1180,23 @@ function qc(k,d){
 function drawChart(canvas,pkey,pdata,sharedPadL){
   const m=PM[pkey],dpr=window.devicePixelRatio||2;
   const rect=canvas.parentElement.getBoundingClientRect();
-  const W=Math.max(rect.width||280,100),H=Math.max(rect.height||200,120);
+  const W=Math.max(rect.width>10?rect.width:280,100);
+  const H=Math.max(rect.height>10?rect.height:200,120);
   canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);
   canvas.style.width=W+'px';canvas.style.height=H+'px';
   const ctx=canvas.getContext('2d');
   ctx.scale(dpr,dpr);ctx.clearRect(0,0,W,H);
+  const snap=v=>Math.round(v*dpr)/dpr; // sub-pixel snap helper
   const tp=pdata.tpts||[],dp=pdata.dpts||[];
   if(!tp.length){ctx.fillStyle='#888';ctx.font='bold 12px system-ui,sans-serif';ctx.textAlign='center';ctx.fillText('No data available',W/2,H/2);return;}
 
-  // Compute Y range first (needed for label width calculation)
   const aY=[...tp.map(p=>p[1]),...dp.map(p=>p[1])];
   (REF_LINES[pkey]||[]).forEach(r=>aY.push(r.v));
   let mn=Math.min(...aY),mx=Math.max(...aY);
   const pd=(mx-mn)*0.13||Math.abs(mx)*0.1||1;
   mn=Math.max(0,mn-pd);mx+=pd;const rng=mx-mn||1;
 
-  // Measure widest Y label to set left padding dynamically
+  // Measure widest Y label
   ctx.font='bold 10px system-ui,sans-serif';
   let maxLabelW=0;
   for(let i=0;i<=4;i++){
@@ -1196,58 +1204,72 @@ function drawChart(canvas,pkey,pdata,sharedPadL){
     const lb=v>=1000?String(Math.round(v)):v>=100?String(Math.round(v)):v>=10?v.toFixed(1):v<0.1?v.toFixed(3):v.toFixed(2);
     maxLabelW=Math.max(maxLabelW,ctx.measureText(lb).width);
   }
-  const computedPadL=Math.ceil(maxLabelW)+18;
+  const computedPadL=Math.ceil(maxLabelW)+20;
   const PAD={t:24,r:14,b:46,l:sharedPadL!=null?sharedPadL:computedPadL};
   const cW=W-PAD.l-PAD.r,cH=H-PAD.t-PAD.b;
 
   const aX=[...tp.map(p=>p[0]+0.5),...dp.map(p=>p[0])];
   const mnX=Math.min(...aX),mxX=Math.max(...aX),xrng=mxX-mnX||1;
   const px=x=>PAD.l+(x-mnX)/xrng*cW;
-  const py=y=>PAD.t+cH-(y-mn)/rng*cH;
+  const py=y=>snap(PAD.t+cH-(y-mn)/rng*cH); // snapped
 
-  // Grid lines
+  // Grid lines — snapped y
   ctx.strokeStyle='rgba(0,0,0,.08)';ctx.lineWidth=1;
-  for(let i=0;i<=4;i++){const yy=PAD.t+i*(cH/4);ctx.beginPath();ctx.moveTo(PAD.l,yy);ctx.lineTo(PAD.l+cW,yy);ctx.stroke();}
+  for(let i=0;i<=4;i++){
+    const yy=snap(PAD.t+i*(cH/4));
+    ctx.beginPath();ctx.moveTo(PAD.l,yy);ctx.lineTo(PAD.l+cW,yy);ctx.stroke();
+  }
 
-  // Reference lines
+  // Reference lines — snapped, crisp
   (REF_LINES[pkey]||[]).forEach(ref=>{
     if(ref.v<mn||ref.v>mx)return;
-    ctx.save();ctx.strokeStyle=ref.c;ctx.lineWidth=1.6;ctx.setLineDash([6,4]);
-    ctx.beginPath();ctx.moveTo(PAD.l,py(ref.v));ctx.lineTo(PAD.l+cW,py(ref.v));ctx.stroke();
-    ctx.setLineDash([]);ctx.fillStyle=ref.c;ctx.font='bold 8.5px system-ui,sans-serif';ctx.textAlign='left';
-    ctx.fillText(ref.lbl,PAD.l+4,py(ref.v)-4);ctx.restore();
+    const ry=snap(py(ref.v));
+    ctx.save();
+    ctx.strokeStyle=ref.c;ctx.lineWidth=1.5;ctx.setLineDash([6,4]);
+    ctx.beginPath();ctx.moveTo(PAD.l,ry);ctx.lineTo(PAD.l+cW,ry);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=ref.c;ctx.font='bold 8.5px system-ui,sans-serif';ctx.textAlign='left';
+    ctx.fillText(ref.lbl,PAD.l+4,ry-4);
+    ctx.restore();
   });
 
   // Data dots
-  if(dp.length){ctx.fillStyle=m.dotC;dp.forEach(pt=>{ctx.beginPath();ctx.arc(px(pt[0]),py(pt[1]),3.5,0,Math.PI*2);ctx.fill();});}
+  if(dp.length){
+    ctx.fillStyle=m.dotC;
+    dp.forEach(pt=>{ctx.beginPath();ctx.arc(px(pt[0]),py(pt[1]),3.5,0,Math.PI*2);ctx.fill();});
+  }
 
   // Trend line
-  ctx.save();ctx.strokeStyle=m.lineC;ctx.lineWidth=3;ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();
+  ctx.save();ctx.strokeStyle=m.lineC;ctx.lineWidth=3;ctx.lineJoin='round';ctx.lineCap='round';
+  ctx.beginPath();
   tp.forEach((pt,ii)=>{const xp=px(pt[0]+0.5);ii===0?ctx.moveTo(xp,py(pt[1])):ctx.lineTo(xp,py(pt[1]));});
   ctx.stroke();ctx.restore();
 
-  // X axis line
+  // X axis line — snapped
+  const xAxisY=snap(PAD.t+cH);
   ctx.strokeStyle='rgba(0,0,0,.2)';ctx.lineWidth=1.2;
-  ctx.beginPath();ctx.moveTo(PAD.l,PAD.t+cH);ctx.lineTo(PAD.l+cW,PAD.t+cH);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(PAD.l,xAxisY);ctx.lineTo(PAD.l+cW,xAxisY);ctx.stroke();
 
-  // X axis labels
+  // X labels
   const yrs=tp.map(p=>p[0]);
   const step=yrs.length>14?4:yrs.length>9?3:yrs.length>6?2:1;
   ctx.fillStyle='#444';ctx.font='bold 10px system-ui,sans-serif';ctx.textAlign='center';
   yrs.forEach((yr,i)=>{if(i%step===0)ctx.fillText(yr,px(yr+0.5),H-PAD.b+16);});
 
-  // Y axis labels
+  // Y labels
   ctx.textAlign='right';ctx.font='bold 10px system-ui,sans-serif';ctx.fillStyle='#444';
   for(let i=0;i<=4;i++){
     const v=mn+((4-i)/4)*rng;
     const lb=v>=1000?Math.round(v):v>=100?Math.round(v):v>=10?v.toFixed(1):v<0.1?v.toFixed(3):v.toFixed(2);
-    ctx.fillText(lb,PAD.l-5,PAD.t+i*(cH/4)+4);
+    ctx.fillText(lb,PAD.l-5,snap(PAD.t+i*(cH/4))+4);
   }
 
   // Y unit label
   ctx.save();ctx.translate(12,PAD.t+cH/2);ctx.rotate(-Math.PI/2);
-  ctx.textAlign='center';ctx.font='bold 9px system-ui,sans-serif';ctx.fillStyle='#666';ctx.fillText(m.unit,0,0);ctx.restore();
+  ctx.textAlign='center';ctx.font='bold 9px system-ui,sans-serif';ctx.fillStyle='#666';
+  ctx.fillText(m.unit,0,0);ctx.restore();
 }
+
 
 
 
@@ -1414,29 +1436,29 @@ function openAllChartsModal(lakeKey, info) {
 
     // After all panels added, compute shared left padding across all charts
     // then redraw with aligned axes
+    // Compute shared left padding from a fixed reference width
+    const offscreen=document.createElement('canvas');
+    const octx=offscreen.getContext('2d');
+    octx.font='bold 10px system-ui,sans-serif';
+    let maxPadL=40;
+    sigParams.forEach(k=>{
+      const d=p[k];
+      const aY=[...d.tpts.map(pt=>pt[1]),...(d.dpts||[]).map(pt=>pt[1])];
+      (REF_LINES[k]||[]).forEach(r=>aY.push(r.v));
+      let mn=Math.min(...aY),mx=Math.max(...aY);
+      const pd2=(mx-mn)*0.13||Math.abs(mx)*0.1||1;
+      mn=Math.max(0,mn-pd2);mx+=pd2;const rng=mx-mn||1;
+      for(let i=0;i<=4;i++){
+        const v=mn+((4-i)/4)*rng;
+        const lb=v>=1000?String(Math.round(v)):v>=100?String(Math.round(v)):v>=10?v.toFixed(1):v<0.1?v.toFixed(3):v.toFixed(2);
+        maxPadL=Math.max(maxPadL,Math.ceil(octx.measureText(lb).width)+20);
+      }
+    });
+    // Draw after two rAF so panels have laid out and getBoundingClientRect is valid
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      // Measure max Y-label width across all sig params
-      const offscreen=document.createElement('canvas');
-      const octx=offscreen.getContext('2d');
-      octx.font='bold 10px system-ui,sans-serif';
-      let maxPadL=40;
-      sigParams.forEach(k=>{
-        const d=p[k];
-        const aY=[...d.tpts.map(pt=>pt[1]),...(d.dpts||[]).map(pt=>pt[1])];
-        (REF_LINES[k]||[]).forEach(r=>aY.push(r.v));
-        let mn=Math.min(...aY),mx=Math.max(...aY);
-        const pd2=(mx-mn)*0.13||Math.abs(mx)*0.1||1;
-        mn=Math.max(0,mn-pd2);mx+=pd2;const rng=mx-mn||1;
-        for(let i=0;i<=4;i++){
-          const v=mn+((4-i)/4)*rng;
-          const lb=v>=1000?String(Math.round(v)):v>=100?String(Math.round(v)):v>=10?v.toFixed(1):v<0.1?v.toFixed(3):v.toFixed(2);
-          maxPadL=Math.max(maxPadL,Math.ceil(octx.measureText(lb).width)+18);
-        }
-      });
-      // Draw all charts with shared padding
       grid.querySelectorAll('.modal-chart-panel canvas').forEach((cv,idx)=>{
         const k=sigParams[idx];
-        cv.style.height='190px';
+        cv.style.height='100%';
         drawChart(cv,k,p[k],maxPadL);
       });
     }));
@@ -1582,7 +1604,7 @@ pills.forEach(p=>p.addEventListener('click',()=>{
       <button class="modal-close-btn" id="modalCloseBtn">&#10005; Close</button>
     </div>
     <div class="modal-tsi-bar" id="modalTsiBar"></div>
-    <div class="modal-body" id="modalChartsGrid"></div>
+    <div class="modal-body"><div class="modal-carousel" id="modalChartsGrid"></div></div>
   </div>
 </div>
 
