@@ -544,25 +544,21 @@ button,input{font:inherit}
 
 /* ── Color-Blind Mode (Wong 2011 palette) ───────────────────────────── */
 
-/* ═══════════════════════════════════════════════════════════════
-   LAKE LAB
-═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════
+   LAKE LAB — all selectors prefixed with #ll- to avoid conflicts
+═══════════════════════════════════════════════════════════════════ */
 #ll-wrap{display:grid;grid-template-columns:300px 1fr;gap:0;border-radius:22px;
   overflow:hidden;box-shadow:0 20px 60px rgba(0,78,154,.15);
   border:1px solid rgba(255,255,255,.7);background:#fff;min-height:520px}
 #ll-panel{background:linear-gradient(180deg,#0f2a45 0%,#1a3f64 100%);
-  padding:18px 16px;display:flex;flex-direction:column;gap:12px;color:#fff}
+  padding:20px 18px;display:flex;flex-direction:column;gap:14px;color:#fff}
 #ll-canvas-wrap{position:relative;background:#87CEEB;overflow:hidden;min-height:480px}
 #ll-canvas{display:block;width:100%;height:100%}
-
-/* FIX 1 — presets: 2-column grid so buttons never smash together */
-#ll-presets{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-.ll-preset{padding:9px 6px;border:none;border-radius:10px;
+#ll-presets{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+.ll-preset{flex:1;min-width:0;padding:8px 6px;border:none;border-radius:10px;
   font-family:inherit;font-size:.78rem;font-weight:700;cursor:pointer;
-  background:rgba(255,255,255,.12);color:#fff;transition:all .2s;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+  background:rgba(255,255,255,.12);color:#fff;transition:all .2s;white-space:nowrap}
 .ll-preset:hover{background:rgba(255,255,255,.25);transform:translateY(-1px)}
-
 #ll-sliders{display:flex;flex-direction:column;gap:14px}
 .ll-slider-group{display:flex;flex-direction:column;gap:5px}
 .ll-slider-row{display:flex;align-items:center;justify-content:space-between}
@@ -570,8 +566,7 @@ button,input{font:inherit}
 .ll-slider-val{font-size:.82rem;font-weight:800;color:#7df0ff;min-width:28px;text-align:right}
 .ll-slider-sub{font-size:.7rem;color:rgba(255,255,255,.55);margin-top:-2px}
 input.ll-range{-webkit-appearance:none;width:100%;height:6px;border-radius:999px;
-  outline:none;cursor:pointer;
-  background:linear-gradient(to right,#7df0ff 0%,#7df0ff var(--pct,20%),rgba(255,255,255,.2) var(--pct,20%))}
+  outline:none;cursor:pointer;background:linear-gradient(to right,#7df0ff 0%,#7df0ff var(--pct,50%),rgba(255,255,255,.2) var(--pct,50%))}
 input.ll-range::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;
   border-radius:50%;background:#7df0ff;border:3px solid #fff;
   box-shadow:0 2px 8px rgba(0,0,0,.3);cursor:pointer}
@@ -757,7 +752,8 @@ input.ll-range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;
   </div>
 </section>
 
-<!-- ── LAKE LAB ──────────────────────────────────────────────── -->
+
+<!-- ── LAKE LAB ──────────────────────────────────────────────────── -->
 <section class="section" id="lake-lab">
   <div class="container">
     <div class="section-head">
@@ -765,14 +761,21 @@ input.ll-range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;
       <h2>Lake Lab 🔬</h2>
       <p>Drag the sliders to add nutrients and watch Oklahoma's lake transform in real time. See how nitrogen and phosphorus affect algae, water clarity, fish — and the Carlson TSI score.</p>
     </div>
+
     <div id="ll-wrap">
+
+      <!-- LEFT PANEL -->
       <div id="ll-panel">
+
+        <!-- Presets -->
         <div id="ll-presets">
           <button class="ll-preset" data-preset="clean">🏞️ Clean Lake</button>
           <button class="ll-preset" data-preset="bloom">🟡 Algae Bloom</button>
           <button class="ll-preset" data-preset="toxic">☠️ Toxic Bloom</button>
           <button class="ll-preset" data-preset="reset">↺ Reset</button>
         </div>
+
+        <!-- Sliders -->
         <div id="ll-sliders">
           <div class="ll-slider-group">
             <div class="ll-slider-row">
@@ -791,6 +794,8 @@ input.ll-range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;
             <input class="ll-range" type="range" id="ll-p" min="0" max="100" value="10">
           </div>
         </div>
+
+        <!-- Auto responses -->
         <div id="ll-responses">
           <div class="ll-resp-group">
             <div class="ll-slider-row">
@@ -807,16 +812,24 @@ input.ll-range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;
             <div class="ll-resp-bar-bg"><div class="ll-resp-bar" id="ll-sec-bar" style="width:92%;background:#0066A6"></div></div>
           </div>
         </div>
+
+        <!-- TSI badge -->
         <div id="ll-tsi-badge">
           <div id="ll-tsi-score">28</div>
           <div id="ll-tsi-cat">💧 Oligotrophic</div>
         </div>
+
+        <!-- Fun facts -->
         <div id="ll-facts">Loading lake facts…</div>
-      </div>
+
+      </div><!-- /ll-panel -->
+
+      <!-- RIGHT PANEL — canvas -->
       <div id="ll-canvas-wrap">
         <canvas id="ll-canvas"></canvas>
       </div>
-    </div>
+
+    </div><!-- /ll-wrap -->
   </div>
 </section>
 
@@ -1803,51 +1816,67 @@ function getMarkerColor(red, green) {
 
 
 // ═══════════════════════════════════════════════════════════════════
-// LAKE LAB
+// LAKE LAB — wired after window load, sized via ResizeObserver
 // ═══════════════════════════════════════════════════════════════════
 (function(){
 'use strict';
 
+// ── State ──────────────────────────────────────────────────────────
 const state = { n: 20, p: 10 };
 
+// ── TSI calculation (Carlson model) ──────────────────────────────
+// nutrientScore = 0.72*P + 0.28*N  (both 0-100 scale)
 function calcTSI(n, p) {
   const ns = 0.28 * n + 0.72 * p;
-  return Math.round(20 + ns * 0.82);
+  return Math.round(20 + ns * 0.82); // maps 0-100 nutrient to ~20-102 TSI
 }
 function tsiCategory(tsi) {
-  if (tsi < 40) return { cat: '💧 Oligotrophic',  color: '#56B4E9', level: 0 };
-  if (tsi < 50) return { cat: '🌿 Mesotrophic',   color: '#009E73', level: 1 };
-  if (tsi < 70) return { cat: '🟡 Eutrophic',     color: '#E69F00', level: 2 };
+  if (tsi < 40) return { cat: '💧 Oligotrophic', color: '#56B4E9', level: 0 };
+  if (tsi < 50) return { cat: '🌿 Mesotrophic',  color: '#009E73', level: 1 };
+  if (tsi < 70) return { cat: '🟡 Eutrophic',    color: '#E69F00', level: 2 };
   return           { cat: '🔴 Hypereutrophic', color: '#D55E00', level: 3 };
 }
+
+// ── Derived scene values from state ───────────────────────────────
 function derive(n, p) {
-  const ns = 0.28 * n + 0.72 * p;
+  const ns = 0.28 * n + 0.72 * p; // 0-100
   const tsi = calcTSI(n, p);
   const tc  = tsiCategory(tsi);
-  const chl = Math.min(100, Math.round(ns * 0.95 + 5));
-  const sec = Math.max(2,   Math.round(100 - ns * 0.92));
-  const lightReach = 1 - ns / 130;
-  return { ns, tsi, tc, chl, sec, lightReach };
+  const chl = Math.min(100, Math.round(ns * 0.95 + 5));       // algae %
+  const sec = Math.max(2,   Math.round(100 - ns * 0.92));     // clarity %
+  const scumDepth  = ns * 0.38;  // px equiv (scaled in draw)
+  const lightReach = 1 - ns / 130;                            // 0-1
+  return { ns, tsi, tc, chl, sec, scumDepth, lightReach };
 }
 
+// ── Fun facts by trophic level ─────────────────────────────────────
 const FACTS = [
-  ["💧 Crystal-clear lakes like this can be 15 meters deep and still show the bottom!",
-   "🐟 Fish in clean lakes stay deep where it's cool and oxygen-rich.",
-   "🌿 Underwater plants thrive when light reaches the lake bed.",
-   "👁️ A Secchi disk can be seen 6–8 meters deep in a lake this clean."],
-  ["🌿 Nutrients are rising — algae is starting to compete for light.",
-   "🐟 Some fish move shallower as oxygen dips near the bottom in summer.",
-   "🔬 Phosphorus at this level fuels about 3× more algae than at clean levels.",
-   "📊 TSI 40–50 means a 'moderate' lake — watchable but worth monitoring."],
-  ["🚨 At this nutrient level, blooms can form in just 2–3 warm days!",
-   "🐟 Fish are stressed — low oxygen zones ('dead zones') form at depth.",
-   "☀️ Only about 30% of sunlight reaches the lake bottom now.",
-   "🌡️ Warm, calm weather makes blooms explode — wind and cooling help break them up."],
-  ["☠️ Cyanotoxins at this level can kill dogs within hours of exposure!",
-   "🐟 Fish kills happen when oxygen crashes overnight after a bloom.",
-   "🌑 The lake bottom is essentially dark — plants and invertebrates disappear.",
-   "🚫 Even brief skin contact with toxic bloom water can cause rashes and illness."]
+  [ // oligotrophic
+    "💧 Crystal-clear lakes like this can be 15 meters deep and still show the bottom!",
+    "🐟 Fish in clean lakes stay deep where it's cool and oxygen-rich.",
+    "🌿 Underwater plants thrive when light reaches the lake bed.",
+    "👁️ A Secchi disk can be seen 6–8 meters deep in a lake this clean."
+  ],
+  [ // mesotrophic
+    "🌿 Nutrients are rising — algae is starting to compete for light.",
+    "🐟 Some fish move shallower as oxygen dips near the bottom in summer.",
+    "🔬 Phosphorus at this level fuels about 3× more algae than at clean levels.",
+    "📊 TSI 40–50 means a 'moderate' lake — watchable but worth monitoring."
+  ],
+  [ // eutrophic
+    "🚨 At this nutrient level, blooms can form in just 2–3 warm days!",
+    "🐟 Fish are stressed — low oxygen zones ('dead zones') form at depth.",
+    "☀️ Only about 30% of sunlight reaches the lake bottom now.",
+    "🌡️ Warm, calm weather makes blooms explode — wind and cooling help break them up."
+  ],
+  [ // hypereutrophic
+    "☠️ Cyanotoxins at this level can kill dogs within hours of exposure!",
+    "🐟 Fish kills happen when oxygen crashes overnight after a bloom.",
+    "🌑 The lake bottom is essentially dark — plants and invertebrates disappear.",
+    "🚫 Even brief skin contact with toxic bloom water can cause rashes and illness."
+  ]
 ];
+
 let factIdx = 0, factTimer = null;
 function rotateFact(level) {
   const pool = FACTS[level] || FACTS[0];
@@ -1855,280 +1884,358 @@ function rotateFact(level) {
   const el = document.getElementById('ll-facts');
   if (!el) return;
   el.style.opacity = '0';
-  setTimeout(function(){ el.textContent = pool[factIdx]; el.style.opacity = '1'; }, 350);
+  setTimeout(() => {
+    el.textContent = pool[factIdx];
+    el.style.opacity = '1';
+  }, 350);
 }
 function startFacts(level) {
   if (factTimer) clearInterval(factTimer);
   const el = document.getElementById('ll-facts');
   if (el) { el.style.opacity = '1'; el.textContent = FACTS[level][0]; }
   factIdx = 0;
-  factTimer = setInterval(function(){ rotateFact(level); }, 5000);
+  factTimer = setInterval(() => rotateFact(level), 5000);
 }
 
+// ── Update left panel UI ──────────────────────────────────────────
 function updatePanel() {
-  const n = state.n, p = state.p;
+  const { n, p } = state;
   const d = derive(n, p);
+
+  // Slider values + track fill
   const nEl = document.getElementById('ll-n');
   const pEl = document.getElementById('ll-p');
   if (nEl) nEl.style.setProperty('--pct', n + '%');
   if (pEl) pEl.style.setProperty('--pct', p + '%');
-  const nvEl = document.getElementById('ll-n-val'); if (nvEl) nvEl.textContent = n;
-  const pvEl = document.getElementById('ll-p-val'); if (pvEl) pvEl.textContent = p;
+  const nvEl = document.getElementById('ll-n-val');
+  const pvEl = document.getElementById('ll-p-val');
+  if (nvEl) nvEl.textContent = n;
+  if (pvEl) pvEl.textContent = p;
+
+  // Algae bar: green → orange → red
   const chlColor = d.ns < 35 ? '#009E73' : d.ns < 65 ? '#E69F00' : '#D55E00';
   const chlBar = document.getElementById('ll-chl-bar');
   const chlVal = document.getElementById('ll-chl-val');
-  if (chlBar){ chlBar.style.width = d.chl+'%'; chlBar.style.background = chlColor; }
-  if (chlVal) chlVal.textContent = d.chl+'%';
+  if (chlBar) { chlBar.style.width = d.chl + '%'; chlBar.style.background = chlColor; }
+  if (chlVal) chlVal.textContent = d.chl + '%';
+
+  // Clarity bar: blue → shrinking
   const secColor = d.sec > 60 ? '#0066A6' : d.sec > 30 ? '#E69F00' : '#D55E00';
   const secBar = document.getElementById('ll-sec-bar');
   const secVal = document.getElementById('ll-sec-val');
-  if (secBar){ secBar.style.width = d.sec+'%'; secBar.style.background = secColor; }
-  if (secVal) secVal.textContent = d.sec+'%';
-  const badge   = document.getElementById('ll-tsi-badge');
+  if (secBar) { secBar.style.width = d.sec + '%'; secBar.style.background = secColor; }
+  if (secVal) secVal.textContent = d.sec + '%';
+
+  // TSI badge
+  const badge = document.getElementById('ll-tsi-badge');
   const scoreEl = document.getElementById('ll-tsi-score');
-  const catEl   = document.getElementById('ll-tsi-cat');
-  if (badge)   badge.style.background = d.tc.color+'44';
+  const catEl = document.getElementById('ll-tsi-cat');
+  if (badge) badge.style.background = d.tc.color + '44';
   if (scoreEl) scoreEl.textContent = d.tsi;
-  if (catEl)  { catEl.textContent = d.tc.cat; catEl.style.color = d.tc.color; }
+  if (catEl) { catEl.textContent = d.tc.cat; catEl.style.color = d.tc.color; }
+
+  // Facts
   startFacts(d.tc.level);
 }
 
-// ── Canvas ────────────────────────────────────────────────────────
-let animHandle = null, canvasReady = false;
+// ── Canvas scene ──────────────────────────────────────────────────
+let animHandle = null;
+let canvasReady = false;
 const canvas = document.getElementById('ll-canvas');
 const wrap   = document.getElementById('ll-canvas-wrap');
 
 function sizeCanvas() {
   if (!wrap || !canvas) return false;
-  const W = wrap.offsetWidth, H = wrap.offsetHeight;
+  const W = wrap.offsetWidth;
+  const H = wrap.offsetHeight;
   if (W < 10 || H < 10) return false;
   const dpr = Math.ceil(window.devicePixelRatio || 1);
-  canvas.width  = W * dpr; canvas.height = H * dpr;
-  canvas.style.width = W+'px'; canvas.style.height = H+'px';
-  canvas.getContext('2d').setTransform(dpr,0,0,dpr,0,0);
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   return true;
-}
-
-// ── FIX 2 & 3: rewritten drawFish uses ctx.save/translate/scale
-// so the entire fish (body + tail + eye) mirrors correctly,
-// and fish are strictly clamped inside [surfaceY, bedY].
-function drawFish(ctx, fx, fy, size, facingRight, belly, opacity) {
-  ctx.save();
-  ctx.globalAlpha = opacity;
-  ctx.translate(fx, fy);
-  if (belly) ctx.rotate(Math.PI);   // upside-down
-  if (!facingRight) ctx.scale(-1, 1); // mirror left — tail follows automatically
-
-  const bL = size * 2.2, bH = size * 0.7;
-  const fishColor = opacity < 0.5 ? 'rgba(180,180,180,0.7)' : 'rgba(100,180,220,0.88)';
-  const tailColor = opacity < 0.5 ? 'rgba(150,150,150,0.7)' : 'rgba(70,140,190,0.88)';
-
-  // Body — always drawn facing RIGHT; ctx.scale(-1,1) handles the mirror
-  ctx.fillStyle = fishColor;
-  ctx.beginPath();
-  ctx.ellipse(0, 0, bL, bH, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Tail — at the LEFT end of the body (since fish faces right)
-  ctx.fillStyle = tailColor;
-  ctx.beginPath();
-  ctx.moveTo(-bL * 0.8, 0);
-  ctx.lineTo(-bL * 0.8 - size * 1.2,  size * 1.0);
-  ctx.lineTo(-bL * 0.8 - size * 1.2, -size * 1.0);
-  ctx.closePath();
-  ctx.fill();
-
-  // Eye — right side of body
-  ctx.fillStyle = '#1a1a1a';
-  ctx.beginPath();
-  ctx.arc(bL * 0.55, -bH * 0.15, size * 0.18, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Highlight
-  ctx.fillStyle = 'rgba(255,255,255,0.35)';
-  ctx.beginPath();
-  ctx.ellipse(-bL * 0.1, -bH * 0.3, bL * 0.35, bH * 0.22, -0.3, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.restore();
 }
 
 function drawScene(t) {
   if (!canvas || !canvasReady) return;
   const ctx = canvas.getContext('2d');
-  const W = wrap.offsetWidth, H = wrap.offsetHeight;
+  const W = wrap.offsetWidth;
+  const H = wrap.offsetHeight;
   if (W < 10 || H < 10) return;
 
-  const n = state.n, p = state.p;
+  const { n, p } = state;
   const d = derive(n, p);
-  const ns = d.ns;
+  const ns = d.ns; // 0-100
 
   // ── Sky ──────────────────────────────────────────────────────────
-  const skyHue = Math.round(200 - ns * 0.6);
+  const skyHue = Math.round(200 - ns * 0.6);  // clear blue → hazy reddish
   const skyGrd = ctx.createLinearGradient(0, 0, 0, H * 0.22);
-  skyGrd.addColorStop(0, 'hsl('+skyHue+','+(Math.round(70-ns*0.3))+'%,'+(Math.round(65-ns*0.18))+'%)');
-  skyGrd.addColorStop(1, 'hsl('+skyHue+',55%,72%)');
+  skyGrd.addColorStop(0, `hsl(${skyHue},${Math.round(70-ns*0.3)}%,${Math.round(65-ns*0.18)}%)`);
+  skyGrd.addColorStop(1, `hsl(${skyHue},55%,72%)`);
   ctx.fillStyle = skyGrd;
   ctx.fillRect(0, 0, W, H * 0.22);
 
   // ── Sun ───────────────────────────────────────────────────────────
-  const sunY = H * 0.09, sunX = W * 0.82;
+  const sunY = H * 0.09;
+  const sunX = W * 0.82;
   const sunAlpha = Math.max(0.25, 1 - ns / 130);
-  ctx.save(); ctx.globalAlpha = sunAlpha;
+  ctx.save();
+  ctx.globalAlpha = sunAlpha;
   const sunGrd = ctx.createRadialGradient(sunX, sunY, 2, sunX, sunY, 36);
   const sunColor = ns < 50 ? '#FFE87C' : '#FF8C4A';
-  sunGrd.addColorStop(0, sunColor); sunGrd.addColorStop(0.4, sunColor+'aa'); sunGrd.addColorStop(1, 'transparent');
-  ctx.fillStyle = sunGrd; ctx.beginPath(); ctx.arc(sunX, sunY, 36, 0, Math.PI*2); ctx.fill();
-  ctx.globalAlpha = 1; ctx.restore();
+  sunGrd.addColorStop(0, sunColor);
+  sunGrd.addColorStop(0.4, sunColor + 'aa');
+  sunGrd.addColorStop(1, 'transparent');
+  ctx.fillStyle = sunGrd;
+  ctx.beginPath();
+  ctx.arc(sunX, sunY, 36, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.restore();
 
-  // ── Water ────────────────────────────────────────────────────────
+  // ── Water surface zone ────────────────────────────────────────────
   const surfaceY = H * 0.22;
   const bedY     = H * 0.88;
   const waterH   = bedY - surfaceY;
+
+  // Water gradient — color shifts by nutrient level
   const waterGrd = ctx.createLinearGradient(0, surfaceY, 0, bedY);
-  const wLight = ns < 35 ? '#3db5e8' : ns < 65 ? '#5ca882' : '#6b7a45';
-  const wDark  = ns < 35 ? '#09446e' : ns < 65 ? '#2d5a3a' : '#1a2310';
-  const darkStart = Math.max(0.15, 0.55 - ns / 200);
-  waterGrd.addColorStop(0, wLight); waterGrd.addColorStop(darkStart, wDark); waterGrd.addColorStop(1, '#050d0a');
-  ctx.fillStyle = waterGrd; ctx.fillRect(0, surfaceY, W, waterH);
+  const waterLight = ns < 35 ? '#3db5e8' : ns < 65 ? '#5ca882' : '#6b7a45';
+  const waterDark  = ns < 35 ? '#09446e' : ns < 65 ? '#2d5a3a' : '#1a2310';
+  const darkStart  = Math.max(0.15, 0.55 - ns / 200);
+  waterGrd.addColorStop(0,          waterLight);
+  waterGrd.addColorStop(darkStart,  waterDark);
+  waterGrd.addColorStop(1,          '#050d0a');
+  ctx.fillStyle = waterGrd;
+  ctx.fillRect(0, surfaceY, W, waterH);
 
   // ── Light rays ────────────────────────────────────────────────────
   const rayDepth = waterH * d.lightReach;
   if (rayDepth > 10) {
-    ctx.save(); ctx.globalAlpha = Math.max(0.04, 0.18 - ns/700); ctx.fillStyle = '#ffffff';
-    for (let i = 0; i < 5; i++) {
-      const rx = W*(0.12+i*0.18)+Math.sin(t/2800+i)*8, rw = 18+i*4;
-      ctx.beginPath(); ctx.moveTo(rx-rw/2,surfaceY); ctx.lineTo(rx+rw/2,surfaceY);
-      ctx.lineTo(rx+rw*1.8,surfaceY+rayDepth); ctx.lineTo(rx-rw*1.2,surfaceY+rayDepth);
-      ctx.closePath(); ctx.fill();
+    ctx.save();
+    ctx.globalAlpha = Math.max(0.04, 0.18 - ns / 700);
+    ctx.fillStyle = '#ffffff';
+    const rayCount = 5;
+    for (let i = 0; i < rayCount; i++) {
+      const rx = W * (0.12 + i * 0.18) + Math.sin(t / 2800 + i) * 8;
+      const rw = 18 + i * 4;
+      ctx.beginPath();
+      ctx.moveTo(rx - rw / 2, surfaceY);
+      ctx.lineTo(rx + rw / 2, surfaceY);
+      ctx.lineTo(rx + rw * 1.8, surfaceY + rayDepth);
+      ctx.lineTo(rx - rw * 1.2, surfaceY + rayDepth);
+      ctx.closePath();
+      ctx.fill();
     }
-    ctx.globalAlpha = 1; ctx.restore();
+    ctx.globalAlpha = 1;
+    ctx.restore();
   }
 
-  // ── Algae scum ────────────────────────────────────────────────────
+  // ── Algae surface scum ────────────────────────────────────────────
   if (ns > 20) {
-    const scumH = Math.min(waterH*0.22, (ns-20)/80*waterH*0.22);
-    const scumGrd = ctx.createLinearGradient(0, surfaceY, 0, surfaceY+scumH);
-    const sc = ns < 50 ? '#4CAF50' : ns < 70 ? '#8BC34A' : '#33691E';
-    scumGrd.addColorStop(0, sc+'ee'); scumGrd.addColorStop(1, sc+'22');
-    ctx.fillStyle = scumGrd; ctx.fillRect(0, surfaceY, W, scumH);
-    ctx.save(); ctx.globalAlpha = 0.35; ctx.fillStyle = ns > 65 ? '#1B5E20' : '#388E3C';
+    const scumH = Math.min(waterH * 0.22, (ns - 20) / 80 * waterH * 0.22);
+    const scumGrd = ctx.createLinearGradient(0, surfaceY, 0, surfaceY + scumH);
+    const scumColor = ns < 50 ? '#4CAF50' : ns < 70 ? '#8BC34A' : '#33691E';
+    scumGrd.addColorStop(0, scumColor + 'ee');
+    scumGrd.addColorStop(1, scumColor + '22');
+    ctx.fillStyle = scumGrd;
+    ctx.fillRect(0, surfaceY, W, scumH);
+
+    // Scum texture blobs
+    ctx.save();
+    ctx.globalAlpha = 0.35;
+    ctx.fillStyle = ns > 65 ? '#1B5E20' : '#388E3C';
     for (let i = 0; i < 12; i++) {
-      const bx = (i/12)*W+Math.sin(t/3000+i*1.3)*14, by = surfaceY+3+Math.sin(t/2000+i)*4;
-      const br = 8+(i%3)*6;
-      ctx.beginPath(); ctx.ellipse(bx, by, br, br*0.5, 0, 0, Math.PI*2); ctx.fill();
+      const bx = (i / 12) * W + Math.sin(t / 3000 + i * 1.3) * 14;
+      const by = surfaceY + 3 + Math.sin(t / 2000 + i) * 4;
+      const br = 8 + (i % 3) * 6;
+      ctx.beginPath();
+      ctx.ellipse(bx, by, br, br * 0.5, 0, 0, Math.PI * 2);
+      ctx.fill();
     }
-    ctx.globalAlpha = 1; ctx.restore();
+    ctx.globalAlpha = 1;
+    ctx.restore();
   }
 
-  // ── Ripples ───────────────────────────────────────────────────────
-  ctx.save(); ctx.globalAlpha = 0.18; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.5;
+  // ── Water ripples at surface ──────────────────────────────────────
+  ctx.save();
+  ctx.globalAlpha = 0.18;
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 1.5;
   for (let i = 0; i < 6; i++) {
-    const rx = (W/6)*i+(W/12)+Math.sin(t/1800+i)*12, ry = surfaceY+4+Math.cos(t/2200+i*0.8)*3;
-    ctx.beginPath(); ctx.arc(rx, ry, 14+i*3, Math.PI, Math.PI*2); ctx.stroke();
+    const rx = (W / 6) * i + (W / 12) + Math.sin(t / 1800 + i) * 12;
+    const ry = surfaceY + 4 + Math.cos(t / 2200 + i * 0.8) * 3;
+    ctx.beginPath();
+    ctx.arc(rx, ry, 14 + i * 3, Math.PI, Math.PI * 2);
+    ctx.stroke();
   }
-  ctx.globalAlpha = 1; ctx.restore();
+  ctx.globalAlpha = 1;
+  ctx.restore();
 
   // ── Secchi disk ───────────────────────────────────────────────────
   const secchiMaxDepth = waterH * 0.72;
   const secchiDepth    = secchiMaxDepth * (d.sec / 100);
-  const secchiX = W * 0.88, secchiY = surfaceY + secchiDepth;
+  const secchiX = W * 0.88;
+  const secchiY = surfaceY + secchiDepth;
+  // String
   ctx.save();
-  ctx.strokeStyle = 'rgba(200,200,200,0.6)'; ctx.lineWidth = 1; ctx.setLineDash([4,3]);
-  ctx.beginPath(); ctx.moveTo(secchiX, surfaceY); ctx.lineTo(secchiX, secchiY); ctx.stroke();
+  ctx.strokeStyle = 'rgba(200,200,200,0.6)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath();
+  ctx.moveTo(secchiX, surfaceY);
+  ctx.lineTo(secchiX, secchiY);
+  ctx.stroke();
   ctx.setLineDash([]);
-  const dAlpha = Math.max(0, d.sec/100 - 0.05);
-  ctx.globalAlpha = dAlpha;
-  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(secchiX, secchiY, 9, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#222'; ctx.beginPath(); ctx.arc(secchiX, secchiY, 9, 0, Math.PI); ctx.fill();
-  ctx.fillStyle = '#fff'; ctx.font = 'bold 6px system-ui'; ctx.textAlign = 'center';
-  ctx.fillText('SD', secchiX, secchiY+3);
-  ctx.globalAlpha = 1; ctx.restore();
+  // Disk
+  const diskAlpha = Math.max(0, d.sec / 100 - 0.05);
+  ctx.globalAlpha = diskAlpha;
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(secchiX, secchiY, 9, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#222';
+  ctx.beginPath(); ctx.arc(secchiX, secchiY, 9, 0, Math.PI); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 6px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('SD', secchiX, secchiY + 3);
+  ctx.globalAlpha = 1;
+  ctx.restore();
 
   // ── Lake bed ──────────────────────────────────────────────────────
+  // Sandy/rocky bottom
   const bedGrd = ctx.createLinearGradient(0, bedY, 0, H);
   bedGrd.addColorStop(0, ns < 40 ? '#c2a46a' : '#6b5a38');
   bedGrd.addColorStop(1, ns < 40 ? '#8b7355' : '#3d3020');
-  ctx.fillStyle = bedGrd; ctx.fillRect(0, bedY, W, H - bedY);
-  const rockAlpha = Math.max(0, d.sec/100 - 0.1);
+  ctx.fillStyle = bedGrd;
+  ctx.fillRect(0, bedY, W, H - bedY);
+
+  // Rocks on bed (visible when clear enough)
+  const rockAlpha = Math.max(0, d.sec / 100 - 0.1);
   if (rockAlpha > 0.05) {
-    ctx.save(); ctx.globalAlpha = rockAlpha * 0.9;
-    [14,10,18,8,16,12,9,20,11,15].forEach(function(r,i){
-      const rx = W*[.08,.18,.27,.38,.47,.56,.65,.73,.82,.91][i], ry = bedY+4;
-      ctx.fillStyle = i%2?'#8d8070':'#a09080';
-      ctx.beginPath(); ctx.ellipse(rx,ry,r,r*0.5,0,0,Math.PI*2); ctx.fill();
-    });
-    ctx.globalAlpha = 1; ctx.restore();
-  }
-  const plantAlpha = Math.max(0, d.sec/100 - 0.2);
-  if (plantAlpha > 0.05) {
-    ctx.save(); ctx.globalAlpha = plantAlpha;
-    [0.1,0.22,0.34,0.5,0.62,0.76].forEach(function(px,i){
-      const baseX = W*px, baseY = bedY, ph = 28+(i%3)*14;
-      ctx.strokeStyle = i%2?'#2e7d32':'#388e3c'; ctx.lineWidth = 2;
+    ctx.save();
+    ctx.globalAlpha = rockAlpha * 0.9;
+    const rockSizes = [14, 10, 18, 8, 16, 12, 9, 20, 11, 15];
+    const rockPos   = [0.08, 0.18, 0.27, 0.38, 0.47, 0.56, 0.65, 0.73, 0.82, 0.91];
+    rockSizes.forEach((r, i) => {
+      const rx = W * rockPos[i];
+      const ry = bedY + 4;
+      ctx.fillStyle = i % 2 ? '#8d8070' : '#a09080';
       ctx.beginPath();
-      ctx.moveTo(baseX, baseY);
-      ctx.bezierCurveTo(baseX+Math.sin(t/2500+i)*8,baseY-ph*0.4,
-        baseX+Math.sin(t/2000+i)*6,baseY-ph*0.7,
-        baseX+Math.sin(t/1800+i)*4,baseY-ph);
-      ctx.stroke();
-      ctx.fillStyle = i%2?'#43a047':'#66bb6a';
-      ctx.beginPath();
-      ctx.ellipse(baseX+Math.sin(t/1800+i)*4,baseY-ph,7,3,Math.sin(t/2000+i)*0.4,0,Math.PI*2);
+      ctx.ellipse(rx, ry, r, r * 0.5, 0, 0, Math.PI * 2);
       ctx.fill();
     });
-    ctx.globalAlpha = 1; ctx.restore();
+    ctx.globalAlpha = 1;
+    ctx.restore();
   }
 
-  // ── Fish — FIX 2 (stay in water) + FIX 3 (tail mirrors correctly) ──
-  // Fish are strictly clamped between surfaceY+fishMinOffset and bedY-fishMaxOffset.
-  // The oscillation range is calculated AFTER clamping so fish never leave the water.
-  // FIX 3: drawFish uses ctx.scale(-1,1) so the ENTIRE fish mirrors, tail included.
-  const fishMinY = surfaceY + 18;   // never above water surface
-  const fishMaxY = bedY - 18;       // never below lake bed
-  const fishSwimH = fishMaxY - fishMinY;
+  // Plants on bed
+  const plantAlpha = Math.max(0, d.sec / 100 - 0.2);
+  if (plantAlpha > 0.05) {
+    ctx.save();
+    ctx.globalAlpha = plantAlpha;
+    const plantPositions = [0.1, 0.22, 0.34, 0.5, 0.62, 0.76];
+    plantPositions.forEach((px, i) => {
+      const baseX = W * px;
+      const baseY = bedY;
+      const ph = 28 + (i % 3) * 14; // plant height
+      ctx.strokeStyle = i % 2 ? '#2e7d32' : '#388e3c';
+      ctx.lineWidth = 2;
+      // Stem
+      ctx.beginPath();
+      ctx.moveTo(baseX, baseY);
+      ctx.bezierCurveTo(
+        baseX + Math.sin(t / 2500 + i) * 8, baseY - ph * 0.4,
+        baseX + Math.sin(t / 2000 + i) * 6, baseY - ph * 0.7,
+        baseX + Math.sin(t / 1800 + i) * 4, baseY - ph
+      );
+      ctx.stroke();
+      // Leaf
+      ctx.fillStyle = i % 2 ? '#43a047' : '#66bb6a';
+      ctx.beginPath();
+      ctx.ellipse(
+        baseX + Math.sin(t / 1800 + i) * 4, baseY - ph,
+        7, 3, Math.sin(t / 2000 + i) * 0.4, 0, Math.PI * 2
+      );
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
 
-  // As nutrients rise, fish compress toward surface (flee from dead zones)
-  const zoneTopFraction  = ns > 70 ? 0.02 : 0.08;
-  const zoneBotFraction  = ns > 70 ? 0.35 : 0.85;
-  const fishZoneMin = fishMinY + fishSwimH * zoneTopFraction;
-  const fishZoneMax = fishMinY + fishSwimH * Math.min(zoneBotFraction, 0.92);
+  // ── Fish ──────────────────────────────────────────────────────────
+  const fishDepthMin = surfaceY + waterH * 0.08;
+  const fishDepthMax = bedY - 20;
+  // Fish flee toward surface as toxicity rises, some go belly-up at max
+  const fishZone = { min: fishDepthMin, max: fishDepthMax };
+  if (ns > 70) {
+    fishZone.min = surfaceY + waterH * 0.02;
+    fishZone.max = surfaceY + waterH * 0.35;
+  }
 
-  const FISH = [
-    {xPct:0.10, spd:0.00038, size:7,  phase:0.0},
-    {xPct:0.23, spd:0.00052, size:9,  phase:1.2},
-    {xPct:0.36, spd:0.00031, size:6,  phase:2.5},
-    {xPct:0.50, spd:0.00044, size:8,  phase:0.8},
-    {xPct:0.63, spd:0.00036, size:10, phase:3.1},
-    {xPct:0.74, spd:0.00048, size:7,  phase:1.7},
-    {xPct:0.85, spd:0.00040, size:9,  phase:2.2},
+  function drawFish(fx, fy, size, dir, belly) {
+    ctx.save();
+    if (belly) {
+      ctx.translate(fx, fy);
+      ctx.rotate(Math.PI);
+    }
+    ctx.fillStyle = ns > 65 ? 'rgba(180,180,180,0.7)' : 'rgba(100,180,220,0.85)';
+    ctx.beginPath();
+    const bodyL = size * 2.2, bodyH = size * 0.7;
+    const facingLeft = dir < 0;
+    const sx = belly ? 0 : fx, sy = belly ? 0 : fy;
+    // Body
+    ctx.ellipse(belly ? 0 : fx, belly ? 0 : fy, bodyL, bodyH, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Tail
+    ctx.fillStyle = ns > 65 ? 'rgba(150,150,150,0.7)' : 'rgba(70,140,190,0.85)';
+    ctx.beginPath();
+    const tx = belly ? (facingLeft ? bodyL * 0.7 : -bodyL * 0.7) : fx + (facingLeft ? bodyL * 0.7 : -bodyL * 0.7);
+    const ty = belly ? 0 : fy;
+    ctx.moveTo(tx, ty);
+    ctx.lineTo(tx + (facingLeft ? 10 : -10) * dir, ty - 8);
+    ctx.lineTo(tx + (facingLeft ? 10 : -10) * dir, ty + 8);
+    ctx.closePath();
+    ctx.fill();
+    // Eye
+    ctx.fillStyle = '#1a1a1a';
+    const ex = belly ? (facingLeft ? -bodyL * 0.5 : bodyL * 0.5) : fx + (facingLeft ? -bodyL * 0.5 : bodyL * 0.5);
+    const ey = belly ? -bodyH * 0.15 : fy - bodyH * 0.15;
+    ctx.beginPath();
+    ctx.arc(ex, ey, size * 0.18, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  const fishCount = 7;
+  const fishData = [
+    { xPct: 0.12, speed: 0.00038, size: 7, phase: 0.0 },
+    { xPct: 0.24, speed: 0.00052, size: 9, phase: 1.2 },
+    { xPct: 0.38, speed: 0.00031, size: 6, phase: 2.5 },
+    { xPct: 0.52, speed: 0.00044, size: 8, phase: 0.8 },
+    { xPct: 0.64, speed: 0.00036, size: 10, phase: 3.1 },
+    { xPct: 0.75, speed: 0.00048, size: 7, phase: 1.7 },
+    { xPct: 0.86, speed: 0.00040, size: 9, phase: 2.2 },
   ];
 
-  FISH.forEach(function(f, i) {
-    const zoneH = fishZoneMax - fishZoneMin;
-    // X oscillation: fish swim back and forth across their lane
-    const xOsc = Math.sin(t * f.spd + f.phase) * W * 0.07;
-    const fx = Math.max(f.size*3, Math.min(W - f.size*3, W * f.xPct + xOsc));
-
-    // Y: base position spread across zone, oscillation stays within zone
-    const baseY01 = i / (FISH.length - 1);          // 0–1 spread
-    const yOscAmt = zoneH * 0.28;                   // max swing within zone
-    const yOsc    = Math.sin(t * f.spd * 0.7 + f.phase + 1) * yOscAmt;
-    const fyBase  = fishZoneMin + zoneH * baseY01;
-    // Clamp so oscillation never pushes fish out of zone
-    const fy = Math.max(fishZoneMin + f.size, Math.min(fishZoneMax - f.size, fyBase + yOsc));
-
-    // Direction: positive sin means moving right
-    const facingRight = Math.cos(t * f.spd + f.phase) > 0;
-
-    // Belly-up only for a few fish at extreme toxicity
+  fishData.forEach((f, i) => {
+    const xOsc = Math.sin(t * f.speed + f.phase) * W * 0.08;
+    const yOsc = Math.sin(t * f.speed * 0.7 + f.phase + 1) * (fishZone.max - fishZone.min) * 0.4;
+    const fx = W * f.xPct + xOsc;
+    const fyBase = fishZone.min + (fishZone.max - fishZone.min) * (i / fishCount);
+    const fy = fyBase + yOsc;
+    const dir = Math.cos(t * f.speed + f.phase) > 0 ? 1 : -1;
     const belly = ns > 88 && i % 3 === 0;
 
-    // Opacity: fish fade below the light reach line
+    // Fish fade out in murky water below clarity line
     const fishY01 = (fy - surfaceY) / waterH;
-    const fadeAlpha = Math.max(0.12, Math.min(0.95, d.lightReach * 2.2 - fishY01 * 1.1));
-
-    drawFish(ctx, fx, fy, f.size, facingRight, belly, fadeAlpha);
+    const fadeAlpha = Math.max(0.1, Math.min(1, d.lightReach * 2.2 - fishY01 * 1.2));
+    ctx.save();
+    ctx.globalAlpha = fadeAlpha;
+    drawFish(fx, fy, f.size, dir, belly);
+    ctx.restore();
   });
 
   // ── Labels ────────────────────────────────────────────────────────
@@ -2136,19 +2243,27 @@ function drawScene(t) {
   ctx.font = 'bold 11px system-ui, sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,0.75)';
   ctx.textAlign = 'left';
+  // Sky label
   ctx.fillText('Sky', 10, 18);
+  // Surface label
   ctx.fillText('Surface', 10, surfaceY + 14);
+  // Bed label
   ctx.fillStyle = ns < 40 ? 'rgba(255,255,240,0.7)' : 'rgba(200,190,180,0.5)';
   ctx.fillText('Lake bed', 10, bedY - 6);
-  ctx.textAlign = 'right'; ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.font = 'bold 9px system-ui';
+  // Secchi label
+  ctx.textAlign = 'right';
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.font = 'bold 9px system-ui';
   ctx.fillText('Secchi disk', secchiX - 12, secchiY + 4);
   ctx.restore();
 }
 
+// ── rAF loop ──────────────────────────────────────────────────────
 let startTime = null;
 function loop(ts) {
   if (!startTime) startTime = ts;
-  drawScene(ts - startTime);
+  const t = ts - startTime;
+  drawScene(t);
   animHandle = requestAnimationFrame(loop);
 }
 
@@ -2159,36 +2274,71 @@ function startLoop() {
   animHandle = requestAnimationFrame(loop);
 }
 
+// ── Wire up events after DOM is ready ─────────────────────────────
 function wireEvents() {
   const nSlider = document.getElementById('ll-n');
   const pSlider = document.getElementById('ll-p');
   if (!nSlider || !pSlider) return;
-  nSlider.addEventListener('input', function(){ state.n = +this.value; updatePanel(); });
-  pSlider.addEventListener('input', function(){ state.p = +this.value; updatePanel(); });
-  const PRESETS = { clean:{n:5,p:3}, bloom:{n:52,p:48}, toxic:{n:88,p:92}, reset:{n:20,p:10} };
-  document.querySelectorAll('.ll-preset').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      const pr = PRESETS[this.dataset.preset]; if (!pr) return;
+
+  nSlider.addEventListener('input', function() {
+    state.n = +this.value;
+    updatePanel();
+  });
+  pSlider.addEventListener('input', function() {
+    state.p = +this.value;
+    updatePanel();
+  });
+
+  const PRESETS = {
+    clean: { n: 5,  p: 3  },
+    bloom: { n: 52, p: 48 },
+    toxic: { n: 88, p: 92 },
+    reset: { n: 20, p: 10 }
+  };
+  document.querySelectorAll('.ll-preset').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const pr = PRESETS[this.dataset.preset];
+      if (!pr) return;
       state.n = pr.n; state.p = pr.p;
       nSlider.value = pr.n; pSlider.value = pr.p;
-      nSlider.style.setProperty('--pct', pr.n+'%');
-      pSlider.style.setProperty('--pct', pr.p+'%');
+      nSlider.style.setProperty('--pct', pr.n + '%');
+      pSlider.style.setProperty('--pct', pr.p + '%');
       updatePanel();
     });
   });
-  window.addEventListener('resize', function(){ if (sizeCanvas()) canvasReady = true; });
+
+  window.addEventListener('resize', function() {
+    if (sizeCanvas()) { canvasReady = true; }
+  });
+
+  // Initial panel state
   updatePanel();
 }
 
+// ── Initialization — use ResizeObserver on the canvas wrap ─────────
+// This fires exactly once the wrap has real pixel dimensions,
+// regardless of reveal animations or scroll position.
 function init() {
   wireEvents();
   if (!wrap) return;
-  if (sizeCanvas()){ canvasReady = true; animHandle = requestAnimationFrame(loop); return; }
-  var ro = new ResizeObserver(function(entries){
-    for (var e of entries){
-      if (e.contentRect.width > 10 && e.contentRect.height > 10 && !canvasReady){
+
+  // Try immediately first (works if section is already laid out)
+  if (sizeCanvas()) {
+    canvasReady = true;
+    animHandle = requestAnimationFrame(loop);
+    return;
+  }
+
+  // Otherwise watch for wrap to get real dimensions
+  const ro = new ResizeObserver(function(entries) {
+    for (const e of entries) {
+      const { width, height } = e.contentRect;
+      if (width > 10 && height > 10 && !canvasReady) {
         ro.disconnect();
-        if (sizeCanvas()){ canvasReady = true; if (!animHandle) animHandle = requestAnimationFrame(loop); }
+        if (sizeCanvas()) {
+          canvasReady = true;
+          if (!animHandle) animHandle = requestAnimationFrame(loop);
+        }
         break;
       }
     }
@@ -2196,15 +2346,21 @@ function init() {
   ro.observe(wrap);
 }
 
+// ── Boot: wire after DOM, init after full layout ───────────────────
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function(){
+  document.addEventListener('DOMContentLoaded', function() {
     wireEvents();
+    // Use window load to guarantee full layout before sizing
     window.addEventListener('load', init);
   });
 } else {
+  // DOM already parsed
   wireEvents();
-  if (document.readyState === 'complete') { init(); }
-  else { window.addEventListener('load', init); }
+  if (document.readyState === 'complete') {
+    init();
+  } else {
+    window.addEventListener('load', init);
+  }
 }
 
 })(); // end IIFE
