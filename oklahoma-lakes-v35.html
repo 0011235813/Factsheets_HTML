@@ -1200,8 +1200,8 @@ function drawChart(canvas,pkey,pdata,sharedPadL){
   // Use integer CSS dimensions to prevent fractional DPR mismatches
   const dpr=Math.ceil(window.devicePixelRatio||1);
   const rect=canvas.parentElement.getBoundingClientRect();
-  const W=Math.floor(rect.width>10?rect.width:280);
-  const H=Math.floor(rect.height>10?rect.height:240);
+  const W=Math.floor(rect.width>10?rect.width:300);
+  const H=Math.floor(rect.height>10?rect.height:260);
   // Set physical canvas size exactly
   canvas.width=W*dpr;
   canvas.height=H*dpr;
@@ -1601,8 +1601,19 @@ function buildCard(lakeKey,info){
     const d=p[k];
     se.textContent=`${PM[k].label} | ${d.by}\u2013${d.ey} | Change: ${d.pct}`;
     cur=k;
-    const delay = fl ? 0 : 820;
-    setTimeout(()=>requestAnimationFrame(()=>drawChart(cv,k,d)), delay);
+    const delay = fl ? 0 : 950;
+    setTimeout(()=>{
+      // Retry until canvas parent has real dimensions (handles slow paints)
+      function tryDraw(attempts){
+        const rect = cv.parentElement ? cv.parentElement.getBoundingClientRect() : {width:0};
+        if(rect.width > 10 || attempts <= 0){
+          requestAnimationFrame(()=>drawChart(cv,k,d));
+        } else {
+          setTimeout(()=>tryDraw(attempts-1), 100);
+        }
+      }
+      tryDraw(5);
+    }, delay);
   }
 
   el.querySelector('[data-viewall]').addEventListener('click',(e)=>{
