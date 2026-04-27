@@ -299,8 +299,8 @@ button,input{font:inherit}
 .rback-tab.t-sec.active{background:#A96728}
 .rback-body{flex:1;display:flex;flex-direction:column;padding:12px 16px 0;overflow:hidden}
 .rback-title{font-size:.8rem;font-weight:800;color:var(--ink);margin-bottom:8px;flex-shrink:0}
-.chart-wrap{flex:1;position:relative;min-height:0}
-.chart-wrap canvas{display:block;width:100%!important;height:100%!important}
+.chart-wrap{flex:1;position:relative;min-height:220px}
+.chart-wrap canvas{display:block}
 .rback-footer{
   display:flex;justify-content:space-between;align-items:center;
   padding:8px 14px 12px;border-top:1px solid var(--line);
@@ -379,8 +379,8 @@ button,input{font:inherit}
 .t-sec.active {background:#A96728}
 .t-turb.active{background:#5b2d8e}
 .rback-body{flex:1;display:flex;flex-direction:column;padding:10px 14px 4px;overflow:hidden}
-.chart-wrap{flex:1;position:relative;min-height:0}
-.chart-wrap canvas{display:block;width:100%!important;height:100%!important}
+.chart-wrap{flex:1;position:relative;min-height:220px}
+.chart-wrap canvas{display:block}
 .rback-footer{display:flex;justify-content:space-between;align-items:center;
   padding:7px 14px 10px;border-top:1px solid var(--line);
   font-size:.72rem;color:var(--muted);font-weight:600;flex-shrink:0}
@@ -442,8 +442,8 @@ button,input{font:inherit}
 .t-n.active{background:#326820}   .t-sec.active{background:#A96728}
 .t-turb.active{background:#5b2d8e}
 .rback-body{flex:1;display:flex;flex-direction:column;padding:10px 14px 4px;overflow:hidden}
-.chart-wrap{flex:1;position:relative;min-height:0}
-.chart-wrap canvas{display:block;width:100%!important;height:100%!important}
+.chart-wrap{flex:1;position:relative;min-height:220px}
+.chart-wrap canvas{display:block}
 .rback-footer{display:flex;justify-content:space-between;align-items:center;
   padding:7px 14px 10px;border-top:1px solid var(--line);
   font-size:.72rem;color:var(--muted);font-weight:600;flex-shrink:0}
@@ -1200,8 +1200,8 @@ function drawChart(canvas,pkey,pdata,sharedPadL){
   // Use integer CSS dimensions to prevent fractional DPR mismatches
   const dpr=Math.ceil(window.devicePixelRatio||1);
   const rect=canvas.parentElement.getBoundingClientRect();
-  const W=Math.floor(rect.width>10?rect.width:300);
-  const H=Math.floor(rect.height>10?rect.height:260);
+  const W=Math.floor(rect.width>10?rect.width:(canvas.parentElement.offsetWidth>10?canvas.parentElement.offsetWidth:300));
+  const H=Math.floor(rect.height>10?rect.height:(canvas.parentElement.offsetHeight>10?canvas.parentElement.offsetHeight:260));
   // Set physical canvas size exactly
   canvas.width=W*dpr;
   canvas.height=H*dpr;
@@ -1601,18 +1601,40 @@ function buildCard(lakeKey,info){
     const d=p[k];
     se.textContent=`${PM[k].label} | ${d.by}\u2013${d.ey} | Change: ${d.pct}`;
     cur=k;
-    if(fl){
-      // Card already flipped — draw immediately with double rAF (same as modal)
+    // Always use ResizeObserver to draw — guarantees real canvas dimensions
+    // regardless of whether card is already flipped or mid-transition.
+    scheduleDraw(k, d);
+  }
+
+  function scheduleDraw(k, d){
+    const wrap = cv.parentElement;
+    // If wrap already has real size, draw immediately
+    const rect = wrap.getBoundingClientRect();
+    if(rect.width > 10 && rect.height > 10){
       requestAnimationFrame(()=>requestAnimationFrame(()=>drawChart(cv,k,d)));
-    } else {
-      // Wait for flip transition to finish, then draw (mirrors modal pattern)
-      const inner = el.querySelector('.roller-inner');
-      function onFlipped(){
-        inner.removeEventListener('transitionend', onFlipped);
+      return;
+    }
+    // Otherwise watch for first resize event on the wrap
+    let fired = false;
+    const ro = new ResizeObserver((entries)=>{
+      for(const e of entries){
+        const cw = e.contentRect.width, ch = e.contentRect.height;
+        if(cw > 10 && ch > 10 && !fired){
+          fired = true;
+          ro.disconnect();
+          requestAnimationFrame(()=>requestAnimationFrame(()=>drawChart(cv,k,d)));
+        }
+      }
+    });
+    ro.observe(wrap);
+    // Safety timeout — if ResizeObserver never fires (hidden element), fall back after transition
+    setTimeout(()=>{
+      if(!fired){
+        fired = true;
+        ro.disconnect();
         requestAnimationFrame(()=>requestAnimationFrame(()=>drawChart(cv,k,d)));
       }
-      inner.addEventListener('transitionend', onFlipped);
-    }
+    }, 700);
   }
 
   el.querySelector('[data-viewall]').addEventListener('click',(e)=>{
