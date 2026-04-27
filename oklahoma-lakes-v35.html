@@ -1601,19 +1601,18 @@ function buildCard(lakeKey,info){
     const d=p[k];
     se.textContent=`${PM[k].label} | ${d.by}\u2013${d.ey} | Change: ${d.pct}`;
     cur=k;
-    const delay = fl ? 0 : 950;
-    setTimeout(()=>{
-      // Retry until canvas parent has real dimensions (handles slow paints)
-      function tryDraw(attempts){
-        const rect = cv.parentElement ? cv.parentElement.getBoundingClientRect() : {width:0};
-        if(rect.width > 10 || attempts <= 0){
-          requestAnimationFrame(()=>drawChart(cv,k,d));
-        } else {
-          setTimeout(()=>tryDraw(attempts-1), 100);
-        }
+    if(fl){
+      // Card already flipped — draw immediately with double rAF (same as modal)
+      requestAnimationFrame(()=>requestAnimationFrame(()=>drawChart(cv,k,d)));
+    } else {
+      // Wait for flip transition to finish, then draw (mirrors modal pattern)
+      const inner = el.querySelector('.roller-inner');
+      function onFlipped(){
+        inner.removeEventListener('transitionend', onFlipped);
+        requestAnimationFrame(()=>requestAnimationFrame(()=>drawChart(cv,k,d)));
       }
-      tryDraw(5);
-    }, delay);
+      inner.addEventListener('transitionend', onFlipped);
+    }
   }
 
   el.querySelector('[data-viewall]').addEventListener('click',(e)=>{
