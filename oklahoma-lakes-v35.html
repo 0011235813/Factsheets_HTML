@@ -464,8 +464,8 @@ button,input{font:inherit}
 .tsi-badge-text .tsi-sub{font-size:.72rem;color:rgba(255,255,255,.75);margin-top:2px}
 /* ── Gauge ────────────────────────────────────────────────────────── */
 .gauge-wrap{display:flex;flex-direction:column;align-items:center;
-  justify-content:center;padding:12px 8px 4px;height:100%}
-.gauge-svg{width:100%;max-width:280px}
+  justify-content:center;padding:8px 8px 4px;height:100%}
+.gauge-svg{width:100%;max-width:300px}
 .gauge-score-label{font-size:2rem;font-weight:900;fill:currentColor}
 .gauge-cat-label{font-size:.85rem;font-weight:700;fill:#4a5568}
 .gauge-sub{font-size:.72rem;fill:#718096}
@@ -1327,7 +1327,7 @@ function buildGauge(lakeKey, tsi) {
   const pct   = (clamp-minS)/(maxS-minS);
   const angleDeg = -180 + pct*180;
   const angleRad = angleDeg * Math.PI/180;
-  const cx=160, cy=140, ri=62, ro=102;
+  const cx=160, cy=148, ri=70, ro=114;
   const needleLen = ri + (ro-ri)*0.5 + 14;
   const needleX = cx + needleLen*Math.cos(angleRad);
   const needleY = cy + needleLen*Math.sin(angleRad);
@@ -1381,7 +1381,7 @@ function buildGauge(lakeKey, tsi) {
   ].filter(Boolean).map(t=>`<div class="tsi-comp-pill">${t}</div>`).join('');
 
   return `<div class="gauge-wrap">
-    <svg class="gauge-svg" viewBox="0 25 320 175" xmlns="http://www.w3.org/2000/svg">
+    <svg class="gauge-svg" viewBox="0 10 320 195" xmlns="http://www.w3.org/2000/svg">
       ${arcs}
       ${ticks}
       <line x1="${cx}" y1="${cy}" x2="${needleX.toFixed(1)}" y2="${needleY.toFixed(1)}"
