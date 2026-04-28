@@ -43,6 +43,7 @@ button,input{font:inherit}
 /* ── HERO WITH IMAGE ─────────────────────────────────────────────── */
 .hero-banner{position:relative;height:420px;overflow:hidden}
 .hero-banner img{width:100%;height:100%;object-fit:cover;object-position:center 40%}
+.hero-banner video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
 .hero-banner-overlay{
   position:absolute;inset:0;
   background:linear-gradient(180deg,rgba(10,30,45,.35) 0%,rgba(10,30,45,.72) 60%,rgba(10,30,45,.92) 100%)}
@@ -664,10 +665,11 @@ input.ll-range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;
 
 <!-- ── HERO BANNER ─────────────────────────────────────────────────── -->
 <div class="hero-banner" id="intro">
-  <img
-    src="https://0011235813.github.io/Factsheets_HTML/NaturalFalls9.jpg"
-    alt="Natural Falls State Park, Oklahoma"
-    onerror="this.parentElement.style.background='linear-gradient(160deg,#2a3a4a,#177e89)';this.style.display='none'">
+  <video autoplay loop muted playsinline
+    onerror="this.style.display='none'"
+    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+    <source src="https://0011235813.github.io/Factsheets_HTML/UnderWater.mp4" type="video/mp4">
+  </video>
   <div class="hero-banner-overlay"></div>
   <div class="container hero-banner-content">
     <div class="hero-title-block">
