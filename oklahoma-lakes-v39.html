@@ -41,9 +41,9 @@ button,input{font:inherit}
 .nav a:hover{background:rgba(255,255,255,.12);color:#fff}
 
 /* ── HERO WITH IMAGE ─────────────────────────────────────────────── */
-.hero-banner{position:relative;width:100%;overflow:hidden;background:#0a1a2a;}
+.hero-banner{position:relative;height:480px;overflow:hidden;background:#0a1a2a;}
 .hero-banner img{width:100%;height:100%;object-fit:cover;object-position:center 40%}
-.hero-banner video{display:block;width:100%;height:auto;}
+.hero-banner video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;}
 .hero-banner-overlay{position:absolute;inset:0;background:linear-gradient(160deg,rgba(10,26,50,.72) 0%,rgba(23,126,137,.45) 100%);z-index:1;}
 .hero-banner-content{position:absolute;inset:0;z-index:2;display:flex;align-items:center;padding:40px 0;}
 .hero-title-block{}
@@ -220,7 +220,7 @@ button,input{font:inherit}
 @media(max-width:760px){
   .topbar-inner{align-items:flex-start;flex-direction:column;gap:12px}
   .nav{width:100%;overflow-x:auto;padding-bottom:4px}
-  /* hero-banner height is now driven by video aspect ratio */
+  .hero-banner{height:520px}
   .hero-banner-content{position:absolute;inset:0;z-index:2;display:flex;align-items:center;padding:40px 0;}
   .hero-stats{align-self:flex-start}
   .card-grid,.monitor-grid,.resource-grid,.issue-grid,.action-grid{grid-template-columns:1fr}
