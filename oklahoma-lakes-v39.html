@@ -41,14 +41,11 @@ button,input{font:inherit}
 .nav a:hover{background:rgba(255,255,255,.12);color:#fff}
 
 /* ── HERO WITH IMAGE ─────────────────────────────────────────────── */
-.hero-banner{position:relative;height:420px;overflow:hidden}
+.hero-banner{position:relative;width:100%;overflow:hidden;background:#0a1a2a;}
 .hero-banner img{width:100%;height:100%;object-fit:cover;object-position:center 40%}
-.hero-banner-overlay{
-  position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(10,30,45,.35) 0%,rgba(10,30,45,.72) 60%,rgba(10,30,45,.92) 100%)}
-.hero-banner-content{
-  position:absolute;bottom:0;left:0;right:0;padding:40px;
-  display:flex;align-items:flex-end;justify-content:space-between;gap:32px;flex-wrap:wrap}
+.hero-banner video{display:block;width:100%;height:auto;}
+.hero-banner-overlay{position:absolute;inset:0;background:linear-gradient(160deg,rgba(10,26,50,.72) 0%,rgba(23,126,137,.45) 100%);z-index:1;}
+.hero-banner-content{position:absolute;inset:0;z-index:2;display:flex;align-items:center;padding:40px 0;}
 .hero-title-block{}
 .hero-kicker{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;
   border-radius:999px;background:rgba(23,126,137,.4);border:1px solid rgba(23,200,215,.3);
@@ -223,8 +220,8 @@ button,input{font:inherit}
 @media(max-width:760px){
   .topbar-inner{align-items:flex-start;flex-direction:column;gap:12px}
   .nav{width:100%;overflow-x:auto;padding-bottom:4px}
-  .hero-banner{height:520px}
-  .hero-banner-content{flex-direction:column;align-items:flex-start;gap:20px}
+  /* hero-banner height is now driven by video aspect ratio */
+  .hero-banner-content{position:absolute;inset:0;z-index:2;display:flex;align-items:center;padding:40px 0;}
   .hero-stats{align-self:flex-start}
   .card-grid,.monitor-grid,.resource-grid,.issue-grid,.action-grid{grid-template-columns:1fr}
   .map-sidebar h2{font-size:1.5rem}
@@ -664,10 +661,10 @@ input.ll-range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;
 
 <!-- ── HERO BANNER ─────────────────────────────────────────────────── -->
 <div class="hero-banner" id="intro">
-  <img
-    src="https://0011235813.github.io/Factsheets_HTML/NaturalFalls9.jpg"
-    alt="Natural Falls State Park, Oklahoma"
-    onerror="this.parentElement.style.background='linear-gradient(160deg,#2a3a4a,#177e89)';this.style.display='none'">
+  <video autoplay loop muted playsinline
+    onerror="this.style.display='none'">
+    <source src="https://0011235813.github.io/Factsheets_HTML/UnderWater.mp4" type="video/mp4">
+  </video>
   <div class="hero-banner-overlay"></div>
   <div class="container hero-banner-content">
     <div class="hero-title-block">
