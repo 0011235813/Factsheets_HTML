@@ -655,7 +655,7 @@ input.ll-range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;
       <h2>What is eutrophication?</h2>
       <p>Eutrophication is a natural process accelerated by human activity — and it's the central challenge facing Oklahoma's lakes today.</p>
     </div>
-    <div class="card-grid" style="grid-template-columns: 1.6fr 1fr; gap: 22px; margin-bottom: 22px;">
+    <div class="card-grid" style="grid-template-columns: 1fr; gap: 22px; margin-bottom: 22px;">
 
       <!-- LARGE MERGED CARD: Definition + Effects + Sources -->
       <article class="info-card reveal">
@@ -685,38 +685,171 @@ input.ll-range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;
         </ul>
       </article>
 
-      <!-- PHOTO CARD: What it looks like -->
-      <article class="info-card reveal" style="padding:0; overflow:hidden; display:flex; flex-direction:column;">
-        <div style="padding:22px 22px 14px;">
-          <div class="icon">👁️</div>
-          <h3>What it looks like</h3>
-          <p style="margin:0 0 14px;">Visual signs of eutrophication range from subtle discoloration to dramatic surface scums. Color can vary from pea-soup green to brown, orange, or blue-green depending on the algae present. Foam along the shoreline, a foul odor, and unusually murky water are all warning signs.</p>
-        </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:3px; flex:1;">
-          <div style="position:relative; overflow:hidden; min-height:160px;">
-            <img src="https://0011235813.github.io/Factsheets_HTML/UnnamedCreek.JPG"
-              alt="Clear, healthy stream water in Oklahoma"
-              style="width:100%;height:100%;object-fit:cover;display:block;">
-            <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.6));padding:8px 10px;color:#fff;font-size:.72rem;font-weight:700;">✅ Healthy — clear water</div>
-          </div>
-          <div style="position:relative; overflow:hidden; min-height:160px;">
-            <img src="https://0011235813.github.io/Factsheets_HTML/NorthCanadianAlgaeBloom.jpg"
-              alt="Severe algae bloom on the North Canadian River"
-              style="width:100%;height:100%;object-fit:cover;display:block;">
-            <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.6));padding:8px 10px;color:#fff;font-size:.72rem;font-weight:700;">⚠️ Active bloom — heavy discoloration</div>
-          </div>
-          <div style="position:relative; overflow:hidden; min-height:160px; grid-column:1/-1;">
-            <img src="https://0011235813.github.io/Factsheets_HTML/EuchaDrone.png"
-              alt="Mild algae bloom at Lake Eucha, Oklahoma"
-              style="width:100%;height:100%;object-fit:cover;object-position:center 40%;display:block;max-height:180px;">
-            <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.6));padding:8px 10px;color:#fff;font-size:.72rem;font-weight:700;">⚠️ Mild bloom — early discoloration and algae growth</div>
-          </div>
-        </div>
-      </article>
+      
 
-    </div>
+    <!-- EUTRO PHOTO FLIP CARDS: Option B -->
+    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-bottom: 22px;">
 
-    <!-- Eutrophication → HABs Bridge -->
+      <!-- CARD 1: Healthy -->
+      <div class="eutroph-flip-scene reveal">
+        <div class="eutroph-flip-card" onclick="this.parentElement.classList.toggle('flipped')">
+          <!-- FRONT: Photo + caption overlay -->
+          <div class="eutroph-face eutroph-front">
+            <div style="position:relative; flex:1; overflow:hidden;">
+              <img src="https://0011235813.github.io/Factsheets_HTML/UnnamedCreek.JPG"
+                alt="Clear, healthy stream water in Oklahoma"
+                style="width:100%; height:100%; object-fit:cover; display:block;">
+              <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,.72) 0%, rgba(0,0,0,.1) 55%, transparent 100%);"></div>
+              <div style="position:absolute; top:14px; left:14px;">
+                <span style="background:rgba(0,158,115,.85); color:#fff; font-size:.72rem; font-weight:800; padding:5px 12px; border-radius:999px; text-transform:uppercase; letter-spacing:.05em;">✅ Healthy</span>
+              </div>
+              <div style="position:absolute; bottom:0; left:0; right:0; padding:18px 16px 14px;">
+                <div style="color:#fff; font-size:1.1rem; font-weight:800; line-height:1.2; margin-bottom:4px;">Clear, Healthy Water</div>
+                <div style="color:rgba(255,255,255,.8); font-size:.8rem; line-height:1.5;">Crystal-clear stream with visible bottom — a sign of low nutrients and a balanced ecosystem.</div>
+              </div>
+            </div>
+            <div style="padding:10px 16px; background:#fff; font-size:.76rem; font-weight:700; color:var(--muted); display:flex; align-items:center; gap:6px;">
+              <span>👆</span> Tap to see water quality details
+            </div>
+          </div>
+          <!-- BACK: Data context -->
+          <div class="eutroph-face eutroph-back">
+            <div style="background:var(--ok); padding:14px 18px; flex-shrink:0;">
+              <div style="font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:rgba(255,255,255,.75); margin-bottom:4px;">Water Quality Profile</div>
+              <div style="color:#fff; font-size:1.1rem; font-weight:800;">✅ Healthy Lake</div>
+            </div>
+            <div style="flex:1; padding:18px; display:flex; flex-direction:column; gap:14px; overflow-y:auto;">
+              <div>
+                <div style="font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--teal-dark); margin-bottom:6px;">TSI Range</div>
+                <div style="background:rgba(0,158,115,.1); border:1.5px solid rgba(0,158,115,.3); border-radius:12px; padding:10px 14px; font-size:1.5rem; font-weight:900; color:var(--ok); line-height:1;">Below 40 <span style="font-size:.8rem; font-weight:600; color:var(--muted);">Oligotrophic</span></div>
+              </div>
+              <div>
+                <div style="font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--teal-dark); margin-bottom:6px;">Key Parameters</div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <div style="background:rgba(0,102,166,.07); border-radius:10px; padding:8px 12px; font-size:.82rem;"><strong>Chlorophyll-a:</strong> <span style="color:var(--ok);">Low (&lt;10 µg/L)</span> — little algae present</div>
+                  <div style="background:rgba(0,102,166,.07); border-radius:10px; padding:8px 12px; font-size:.82rem;"><strong>Secchi depth:</strong> <span style="color:var(--ok);">Deep (&gt;2m)</span> — high water clarity</div>
+                  <div style="background:rgba(0,102,166,.07); border-radius:10px; padding:8px 12px; font-size:.82rem;"><strong>Total Phosphorus:</strong> <span style="color:var(--ok);">Low (&lt;0.02 mg/L)</span></div>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--teal-dark); margin-bottom:6px;">What it means</div>
+                <p style="margin:0; font-size:.83rem; color:var(--muted); line-height:1.6;">Safe for swimming and recreation. Healthy fish populations, diverse aquatic plants, and no bloom risk. Rare in Oklahoma — most lakes score much higher.</p>
+              </div>
+            </div>
+            <div style="padding:10px 16px; border-top:1px solid var(--line); font-size:.76rem; font-weight:700; color:var(--muted); display:flex; align-items:center; gap:6px; flex-shrink:0; cursor:pointer;" onclick="eutrophFlipBack(this, event)">
+              ← Back to photo
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 2: Mild Bloom -->
+      <div class="eutroph-flip-scene reveal">
+        <div class="eutroph-flip-card" onclick="this.parentElement.classList.toggle('flipped')">
+          <!-- FRONT -->
+          <div class="eutroph-face eutroph-front">
+            <div style="position:relative; flex:1; overflow:hidden;">
+              <img src="https://0011235813.github.io/Factsheets_HTML/EuchaDrone.png"
+                alt="Mild algae bloom at Lake Eucha, Oklahoma"
+                style="width:100%; height:100%; object-fit:cover; display:block;">
+              <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,.72) 0%, rgba(0,0,0,.1) 55%, transparent 100%);"></div>
+              <div style="position:absolute; top:14px; left:14px;">
+                <span style="background:rgba(230,159,0,.9); color:#fff; font-size:.72rem; font-weight:800; padding:5px 12px; border-radius:999px; text-transform:uppercase; letter-spacing:.05em;">⚠️ Mild Bloom</span>
+              </div>
+              <div style="position:absolute; bottom:0; left:0; right:0; padding:18px 16px 14px;">
+                <div style="color:#fff; font-size:1.1rem; font-weight:800; line-height:1.2; margin-bottom:4px;">Early Bloom — Lake Eucha</div>
+                <div style="color:rgba(255,255,255,.8); font-size:.8rem; line-height:1.5;">Discoloration beginning — the lake is entering the eutrophic range with algae starting to dominate.</div>
+              </div>
+            </div>
+            <div style="padding:10px 16px; background:#fff; font-size:.76rem; font-weight:700; color:var(--muted); display:flex; align-items:center; gap:6px;">
+              <span>👆</span> Tap to see water quality details
+            </div>
+          </div>
+          <!-- BACK -->
+          <div class="eutroph-face eutroph-back">
+            <div style="background:var(--gold); padding:14px 18px; flex-shrink:0;">
+              <div style="font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:rgba(255,255,255,.75); margin-bottom:4px;">Water Quality Profile</div>
+              <div style="color:#fff; font-size:1.1rem; font-weight:800;">⚠️ Mild Bloom</div>
+            </div>
+            <div style="flex:1; padding:18px; display:flex; flex-direction:column; gap:14px; overflow-y:auto;">
+              <div>
+                <div style="font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--teal-dark); margin-bottom:6px;">TSI Range</div>
+                <div style="background:rgba(230,159,0,.1); border:1.5px solid rgba(230,159,0,.4); border-radius:12px; padding:10px 14px; font-size:1.5rem; font-weight:900; color:var(--gold); line-height:1;">50–65 <span style="font-size:.8rem; font-weight:600; color:var(--muted);">Eutrophic</span></div>
+              </div>
+              <div>
+                <div style="font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--teal-dark); margin-bottom:6px;">Key Parameters</div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <div style="background:rgba(230,159,0,.07); border-radius:10px; padding:8px 12px; font-size:.82rem;"><strong>Chlorophyll-a:</strong> <span style="color:var(--gold);">Elevated (10–30 µg/L)</span> — algae building</div>
+                  <div style="background:rgba(230,159,0,.07); border-radius:10px; padding:8px 12px; font-size:.82rem;"><strong>Secchi depth:</strong> <span style="color:var(--gold);">Reduced (1–2m)</span> — clarity declining</div>
+                  <div style="background:rgba(230,159,0,.07); border-radius:10px; padding:8px 12px; font-size:.82rem;"><strong>Total Phosphorus:</strong> <span style="color:var(--gold);">Moderate (0.02–0.1 mg/L)</span></div>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--teal-dark); margin-bottom:6px;">What it means</div>
+                <p style="margin:0; font-size:.83rem; color:var(--muted); line-height:1.6;">Recreational use is generally still OK but watch for changes. Algae growth is noticeable. Conditions can worsen quickly in hot, calm weather — bloom risk is real and rising.</p>
+              </div>
+            </div>
+            <div style="padding:10px 16px; border-top:1px solid var(--line); font-size:.76rem; font-weight:700; color:var(--muted); display:flex; align-items:center; gap:6px; flex-shrink:0; cursor:pointer;" onclick="eutrophFlipBack(this, event)">
+              ← Back to photo
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 3: Active/Severe Bloom -->
+      <div class="eutroph-flip-scene reveal">
+        <div class="eutroph-flip-card" onclick="this.parentElement.classList.toggle('flipped')">
+          <!-- FRONT -->
+          <div class="eutroph-face eutroph-front">
+            <div style="position:relative; flex:1; overflow:hidden;">
+              <img src="https://0011235813.github.io/Factsheets_HTML/NorthCanadianAlgaeBloom.jpg"
+                alt="Severe algae bloom on the North Canadian River"
+                style="width:100%; height:100%; object-fit:cover; display:block;">
+              <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,.72) 0%, rgba(0,0,0,.1) 55%, transparent 100%);"></div>
+              <div style="position:absolute; top:14px; left:14px;">
+                <span style="background:rgba(213,94,0,.9); color:#fff; font-size:.72rem; font-weight:800; padding:5px 12px; border-radius:999px; text-transform:uppercase; letter-spacing:.05em;">🚫 Severe Bloom</span>
+              </div>
+              <div style="position:absolute; bottom:0; left:0; right:0; padding:18px 16px 14px;">
+                <div style="color:#fff; font-size:1.1rem; font-weight:800; line-height:1.2; margin-bottom:4px;">Active HAB — North Canadian River</div>
+                <div style="color:rgba(255,255,255,.8); font-size:.8rem; line-height:1.5;">Heavy yellow-green discoloration — a dense cyanobacteria bloom. Potentially toxic. Avoid contact.</div>
+              </div>
+            </div>
+            <div style="padding:10px 16px; background:#fff; font-size:.76rem; font-weight:700; color:var(--muted); display:flex; align-items:center; gap:6px;">
+              <span>👆</span> Tap to see water quality details
+            </div>
+          </div>
+          <!-- BACK -->
+          <div class="eutroph-face eutroph-back">
+            <div style="background:var(--danger); padding:14px 18px; flex-shrink:0;">
+              <div style="font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:rgba(255,255,255,.75); margin-bottom:4px;">Water Quality Profile</div>
+              <div style="color:#fff; font-size:1.1rem; font-weight:800;">🚫 Severe / HAB Conditions</div>
+            </div>
+            <div style="flex:1; padding:18px; display:flex; flex-direction:column; gap:14px; overflow-y:auto;">
+              <div>
+                <div style="font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--teal-dark); margin-bottom:6px;">TSI Range</div>
+                <div style="background:rgba(213,94,0,.1); border:1.5px solid rgba(213,94,0,.4); border-radius:12px; padding:10px 14px; font-size:1.5rem; font-weight:900; color:var(--danger); line-height:1;">Above 70 <span style="font-size:.8rem; font-weight:600; color:var(--muted);">Hypereutrophic</span></div>
+              </div>
+              <div>
+                <div style="font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--teal-dark); margin-bottom:6px;">Key Parameters</div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <div style="background:rgba(213,94,0,.07); border-radius:10px; padding:8px 12px; font-size:.82rem;"><strong>Chlorophyll-a:</strong> <span style="color:var(--danger);">Very high (&gt;40 µg/L)</span> — dense bloom</div>
+                  <div style="background:rgba(213,94,0,.07); border-radius:10px; padding:8px 12px; font-size:.82rem;"><strong>Secchi depth:</strong> <span style="color:var(--danger);">Very shallow (&lt;0.5m)</span> — near zero clarity</div>
+                  <div style="background:rgba(213,94,0,.07); border-radius:10px; padding:8px 12px; font-size:.82rem;"><strong>Total Phosphorus:</strong> <span style="color:var(--danger);">High (&gt;0.1 mg/L)</span></div>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--teal-dark); margin-bottom:6px;">What it means</div>
+                <p style="margin:0; font-size:.83rem; color:var(--muted); line-height:1.6;"><strong style="color:var(--danger);">Avoid all contact.</strong> Cyanobacteria may be producing toxins invisible to the naked eye. Fish kills, oxygen depletion, and swimming advisories are common at this stage.</p>
+              </div>
+            </div>
+            <div style="padding:10px 16px; border-top:1px solid var(--line); font-size:.76rem; font-weight:700; color:var(--muted); display:flex; align-items:center; gap:6px; flex-shrink:0; cursor:pointer;" onclick="eutrophFlipBack(this, event)">
+              ← Back to photo
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- Eutrophication → HABs Bridge -->
     <div class="reveal" style="background:linear-gradient(135deg,rgba(0,78,154,.07),rgba(213,94,0,.06)); border:1.5px solid rgba(213,94,0,.2); border-radius:20px; padding:28px 32px;">
       <div style="display:flex; align-items:flex-start; gap:18px; flex-wrap:wrap;">
         <div style="font-size:2.2rem; flex-shrink:0;">🔗</div>
@@ -2300,6 +2433,13 @@ if (document.readyState === 'loading') {
 </div>
 
 
+
+<script>
+function eutrophFlipBack(el, e) {
+  e.stopPropagation();
+  el.closest('.eutroph-flip-scene').classList.remove('flipped');
+}
+</script>
 </body>
 </html>
 
