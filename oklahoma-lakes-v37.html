@@ -1929,12 +1929,12 @@ function drawScene(t) {
   ctx.fillStyle = skyGrd;
   ctx.fillRect(0, 0, W, H * 0.22);
 
-  // ── Sun ───────────────────────────────────────────────────────────
+  // ── Sun — always full brightness in the sky regardless of nutrient level
+  // Light penetration into the water is handled separately by lightReach/light rays.
   const sunY = H * 0.09, sunX = W * 0.82;
-  const sunAlpha = Math.max(0.25, 1 - ns / 130);
-  ctx.save(); ctx.globalAlpha = sunAlpha;
+  ctx.save(); ctx.globalAlpha = 1;
   const sunGrd = ctx.createRadialGradient(sunX, sunY, 2, sunX, sunY, 36);
-  const sunColor = ns < 50 ? '#FFE87C' : '#FF8C4A';
+  const sunColor = '#FFE87C';
   sunGrd.addColorStop(0, sunColor); sunGrd.addColorStop(0.4, sunColor+'aa'); sunGrd.addColorStop(1, 'transparent');
   ctx.fillStyle = sunGrd; ctx.beginPath(); ctx.arc(sunX, sunY, 36, 0, Math.PI*2); ctx.fill();
   ctx.globalAlpha = 1; ctx.restore();
