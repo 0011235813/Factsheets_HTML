@@ -1918,11 +1918,14 @@ function drawScene(t) {
   const d = derive(n, p);
   const ns = d.ns;
 
-  // ── Sky ──────────────────────────────────────────────────────────
-  const skyHue = Math.round(200 - ns * 0.6);
+  // ── Sky — hue locked to blue, only saturation/lightness shift with pollution
+  // skyHue stays 205-215 (blue) always. At high nutrients: hazier, slightly darker.
+  const skyHue = 210;
+  const skySat  = Math.round(65 - ns * 0.22);   // 65% clean → 43% hazy
+  const skyLit  = Math.round(62 - ns * 0.10);   // 62% clean → 52% overcast
   const skyGrd = ctx.createLinearGradient(0, 0, 0, H * 0.22);
-  skyGrd.addColorStop(0, 'hsl('+skyHue+','+(Math.round(70-ns*0.3))+'%,'+(Math.round(65-ns*0.18))+'%)');
-  skyGrd.addColorStop(1, 'hsl('+skyHue+',55%,72%)');
+  skyGrd.addColorStop(0, 'hsl('+skyHue+','+skySat+'%,'+skyLit+'%)');
+  skyGrd.addColorStop(1, 'hsl('+skyHue+','+(skySat+8)+'%,'+(skyLit+10)+'%)');
   ctx.fillStyle = skyGrd;
   ctx.fillRect(0, 0, W, H * 0.22);
 
