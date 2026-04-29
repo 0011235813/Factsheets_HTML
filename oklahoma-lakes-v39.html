@@ -1918,7 +1918,7 @@ function openAllChartsModal(lakeKey, info) {
     sigParams.forEach(k=>{
       const d=p[k];
       const aY=[...d.tpts.map(pt=>pt[1]),...(d.dpts||[]).map(pt=>pt[1])];
-      (REF_LINES[k]||[]).forEach(r=>aY.push(r.v));
+      getRefLines(k,lakeKey).forEach(r=>aY.push(r.v));
       let mn=Math.min(...aY),mx=Math.max(...aY);
       const pd2=(mx-mn)*0.13||Math.abs(mx)*0.1||1;
       mn=Math.max(0,mn-pd2);mx+=pd2;const rng=mx-mn||1;
