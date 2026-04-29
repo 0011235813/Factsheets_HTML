@@ -625,6 +625,37 @@ input.ll-range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;
   transform: rotateY(180deg);
 }
 
+
+/* ── REGIONAL CALLOUT SECTION ──────────────────────────────────────────────── */
+#regional{background:linear-gradient(135deg,#0f2a45 0%,#1a4a6e 60%,#177e89 100%);color:#fff;padding:72px 0;}
+#regional .section-head .kicker{color:#7df0ff}
+#regional .section-head h2{color:#fff}
+#regional .section-head p{color:rgba(255,255,255,.8)}
+.regional-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:36px}
+@media(max-width:800px){.regional-grid{grid-template-columns:1fr}}
+.regional-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+  border-radius:20px;padding:28px 24px;display:flex;flex-direction:column;gap:12px;
+  transition:background .25s,transform .25s;text-decoration:none;color:#fff}
+.regional-card:hover{background:rgba(255,255,255,.16);transform:translateY(-3px)}
+.regional-card-icon{font-size:2rem;line-height:1}
+.regional-card-title{font-size:1.15rem;font-weight:800;color:#fff}
+.regional-card-desc{font-size:.88rem;color:rgba(255,255,255,.75);line-height:1.6;flex:1}
+.regional-card-cta{font-size:.82rem;font-weight:700;color:#7df0ff;margin-top:4px}
+.regional-highlight{grid-column:1/-1;background:rgba(125,240,255,.10);
+  border:2px solid rgba(125,240,255,.35);border-radius:20px;padding:32px 28px;
+  display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.regional-highlight-text{flex:1;min-width:220px}
+.regional-highlight-text h3{font-size:1.25rem;font-weight:900;color:#7df0ff;margin-bottom:8px}
+.regional-highlight-text p{font-size:.92rem;color:rgba(255,255,255,.82);line-height:1.65}
+.regional-highlight-btn{display:inline-block;background:#7df0ff;color:#0f2a45;
+  font-weight:800;font-size:.92rem;padding:14px 28px;border-radius:999px;
+  text-decoration:none;white-space:nowrap;transition:background .2s,transform .2s;flex-shrink:0}
+.regional-highlight-btn:hover{background:#fff;transform:translateY(-2px)}
+.regional-stats{display:flex;gap:24px;flex-wrap:wrap;margin-top:8px}
+.regional-stat{text-align:center}
+.regional-stat-num{font-size:2rem;font-weight:900;color:#7df0ff;line-height:1}
+.regional-stat-label{font-size:.72rem;color:rgba(255,255,255,.6);margin-top:2px;text-transform:uppercase;letter-spacing:.05em}
+
 </style>
 </head>
 <body>
@@ -654,6 +685,7 @@ input.ll-range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;
       <a href="#lakes">Lakes</a>
       <a href="#drivers">Why It's Worse</a>
       <a href="#actions">Act</a>
+      <a href="#regional">Regions</a>
       <a href="#resources">Resources</a>
     </nav>
 
@@ -1270,6 +1302,80 @@ input.ll-range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;
 
 
 <!-- ── RESOURCES ──────────────────────────────────────────────────── -->
+
+<!-- ── REGIONAL SUMMARIES ────────────────────────────────────────────────── -->
+<section class="section" id="regional">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="kicker">Go Deeper</div>
+      <h2>Explore Oklahoma Water Quality by Region</h2>
+      <p>Your colleagues in the OWRB WATER Division have built detailed regional water quality summaries covering lakes, streams, and groundwater across all 13 planning regions of Oklahoma — with trend maps, trophic data, and local context.</p>
+    </div>
+
+    <div class="regional-grid">
+
+      <!-- Big highlight card — the main link -->
+      <div class="regional-highlight reveal">
+        <div class="regional-highlight-text">
+          <h3>Oklahoma Comprehensive Water Plan — Regional Summaries</h3>
+          <p>Explore interactive water quality experiences for all 13 Oklahoma planning regions. Each region includes trend analysis, trophic state data, nutrient monitoring results, and special provision lake designations — all built and maintained by the OWRB WATER Division.</p>
+          <div class="regional-stats">
+            <div class="regional-stat"><div class="regional-stat-num">13</div><div class="regional-stat-label">Planning Regions</div></div>
+            <div class="regional-stat"><div class="regional-stat-num">80+</div><div class="regional-stat-label">Lakes Monitored</div></div>
+            <div class="regional-stat"><div class="regional-stat-num">6</div><div class="regional-stat-label">Parameters Tracked</div></div>
+          </div>
+        </div>
+        <a class="regional-highlight-btn"
+           href="https://oklahoma.gov/owrb/water-planning/regional-summaries.html"
+           target="_blank" rel="noopener">
+          Explore All Regions →
+        </a>
+      </div>
+
+      <!-- Card: What the regional experiences show -->
+      <a class="regional-card reveal"
+         href="https://oklahoma.gov/owrb/water-planning/regional-summaries.html"
+         target="_blank" rel="noopener">
+        <div class="regional-card-icon">📊</div>
+        <div class="regional-card-title">Trophic State & Nutrient Trends</div>
+        <div class="regional-card-desc">Each regional experience shows lake surface area by trophic status, mean chlorophyll-a concentrations, and nitrogen and phosphorus trend maps — the same parameters driving eutrophication statewide.</div>
+        <div class="regional-card-cta">View regional trends →</div>
+      </a>
+
+      <!-- Card: Monitoring context -->
+      <a class="regional-card reveal"
+         href="https://oklahoma.gov/owrb/water-planning/regional-summaries.html"
+         target="_blank" rel="noopener">
+        <div class="regional-card-icon">🗺️</div>
+        <div class="regional-card-title">Statewide Lake Monitoring Context</div>
+        <div class="regional-card-desc">Oklahoma has over 300 lakes exceeding 50 surface acres. The OWRB currently monitors 80 of them — the regional summaries show exactly which lakes are monitored in your area and what the data shows.</div>
+        <div class="regional-card-cta">Find your region →</div>
+      </a>
+
+      <!-- Card: Special provision lakes -->
+      <a class="regional-card reveal"
+         href="https://oklahoma.gov/owrb/water-planning/regional-summaries.html"
+         target="_blank" rel="noopener">
+        <div class="regional-card-icon">🛡️</div>
+        <div class="regional-card-title">Special Provision Lakes</div>
+        <div class="regional-card-desc">Some Oklahoma lakes carry Sensitive Water Supply (SWS) or Nutrient Limited Watershed (NLW) designations, giving them additional protections. The regional summaries identify which lakes in your area have these designations.</div>
+        <div class="regional-card-cta">Learn about protections →</div>
+      </a>
+
+      <!-- Card: Turbidity & treatment costs -->
+      <a class="regional-card reveal"
+         href="https://oklahoma.gov/owrb/water-planning/regional-summaries.html"
+         target="_blank" rel="noopener">
+        <div class="regional-card-icon">💧</div>
+        <div class="regional-card-title">Turbidity & Water Treatment Costs</div>
+        <div class="regional-card-desc">High turbidity reduces water clarity, increases treatment costs, and signals erosion and sedimentation. Regional data shows which lakes exceed the Oklahoma Water Quality Standards criterion of 25 NTU.</div>
+        <div class="regional-card-cta">See turbidity data →</div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
 <section class="section" id="resources">
   <div class="container">
     <div class="section-head reveal">
@@ -2174,22 +2280,19 @@ function drawScene(t) {
   const ns = d.ns;
 
   // ── Sky ──────────────────────────────────────────────────────────
-  // Sky — hue locked to blue, only saturation/lightness shift with pollution
-  const skyHue = 210;
-  const skySat  = Math.round(65 - ns * 0.22);
-  const skyLit  = Math.round(62 - ns * 0.10);
+  const skyHue = Math.round(200 - ns * 0.6);
   const skyGrd = ctx.createLinearGradient(0, 0, 0, H * 0.22);
-  skyGrd.addColorStop(0, 'hsl('+skyHue+','+skySat+'%,'+skyLit+'%)');
-  skyGrd.addColorStop(1, 'hsl('+skyHue+','+(skySat+8)+'%,'+(skyLit+10)+'%)');
+  skyGrd.addColorStop(0, 'hsl('+skyHue+','+(Math.round(70-ns*0.3))+'%,'+(Math.round(65-ns*0.18))+'%)');
+  skyGrd.addColorStop(1, 'hsl('+skyHue+',55%,72%)');
   ctx.fillStyle = skyGrd;
   ctx.fillRect(0, 0, W, H * 0.22);
 
   // ── Sun ───────────────────────────────────────────────────────────
   const sunY = H * 0.09, sunX = W * 0.82;
-  // Sun — always full brightness regardless of nutrient level
-  ctx.save(); ctx.globalAlpha = 1;
+  const sunAlpha = Math.max(0.25, 1 - ns / 130);
+  ctx.save(); ctx.globalAlpha = sunAlpha;
   const sunGrd = ctx.createRadialGradient(sunX, sunY, 2, sunX, sunY, 36);
-  const sunColor = '#FFE87C';
+  const sunColor = ns < 50 ? '#FFE87C' : '#FF8C4A';
   sunGrd.addColorStop(0, sunColor); sunGrd.addColorStop(0.4, sunColor+'aa'); sunGrd.addColorStop(1, 'transparent');
   ctx.fillStyle = sunGrd; ctx.beginPath(); ctx.arc(sunX, sunY, 36, 0, Math.PI*2); ctx.fill();
   ctx.globalAlpha = 1; ctx.restore();
