@@ -1600,7 +1600,21 @@ revealEls.forEach(el => io.observe(el));
 <script id="cardRollerScript">
 (function(){
 
-const REF_LINES={"chl":[{"v":10,"lbl":"10 \u00b5g/L (SWS Criterion)","c":"#E69F00"},{"v":20,"lbl":"20 \u00b5g/L (Eutrophication)","c":"#D55E00"}],"turb":[{"v":25,"lbl":"25 NTU (Lake Criterion)","c":"#0072B2"}],"p":[{"v":0.037,"lbl":"0.037 mg/L (EPA Ref)","c":"#009E73"}],"n":[{"v":0.54,"lbl":"0.54 mg/L (EPA Ref)","c":"#009E73"}],"sec":[]};
+const LAKE_THRESHOLDS={"Arbuckle":{"tp":0.021,"tn":0.76},"Arcadia":{"tp":0.042,"tn":1.0},"Atoka":{"tp":0.017,"tn":0.6},"Birch":{"tp":0.022,"tn":0.76},"Bluestem":{"tp":0.022,"tn":0.76},"Boomer":{"tp":0.048,"tn":1.0},"BrokenBow":{"tp":0.017,"tn":0.6},"Canton":{"tp":0.045,"tn":1.0},"CarlAlbert":{"tp":0.018,"tn":0.6},"CarlBlackwell":{"tp":0.042,"tn":1.0},"Chandler":{"tp":0.024,"tn":0.76},"Chickasha":{"tp":0.045,"tn":1.0},"Claremore":{"tp":0.028,"tn":0.78},"ClearCreek":{"tp":0.023,"tn":0.76},"Clinton":{"tp":0.045,"tn":1.0},"Coalgate":{"tp":0.023,"tn":0.76},"Copan":{"tp":0.027,"tn":0.78},"Crowder":{"tp":0.048,"tn":1.0},"Cushing":{"tp":0.045,"tn":1.0},"DrippingSprings":{"tp":0.023,"tn":0.76},"Duncan":{"tp":0.024,"tn":0.76},"Ellsworth":{"tp":0.042,"tn":1.0},"ElmerThomas":{"tp":0.038,"tn":1.0},"Eucha":{"tp":0.024,"tn":0.78},"Eufaula":{"tp":0.021,"tn":0.76},"FortCobb":{"tp":0.042,"tn":1.0},"FortGibson":{"tp":0.016,"tn":0.69},"FortSupply":{"tp":0.045,"tn":1.0},"Foss":{"tp":0.038,"tn":1.0},"Frederick":{"tp":0.045,"tn":1.0},"Fuqua":{"tp":0.023,"tn":0.76},"Grand":{"tp":0.024,"tn":0.78},"GreatSaltPlains":{"tp":0.055,"tn":1.0},"Greenleaf":{"tp":0.017,"tn":0.69},"Guthrie":{"tp":0.048,"tn":1.0},"Hefner":{"tp":0.038,"tn":1.0},"Heyburn":{"tp":0.023,"tn":0.76},"Holdenville":{"tp":0.022,"tn":0.76},"HudsonLake":{"tp":0.024,"tn":0.78},"Hugo":{"tp":0.025,"tn":0.53},"Hulah":{"tp":0.025,"tn":0.76},"Humphreys":{"tp":0.022,"tn":0.76},"JeanNeustadt":{"tp":0.022,"tn":0.76},"JohnWells":{"tp":0.022,"tn":0.64},"Kaw":{"tp":0.021,"tn":0.76},"Keystone":{"tp":0.021,"tn":0.76},"Konawa":{"tp":0.022,"tn":0.76},"LakeHudsonDelawareCounty":{"tp":0.022,"tn":0.76},"Langston":{"tp":0.042,"tn":1.0},"Lawtonka":{"tp":0.038,"tn":1.0},"Liberty":{"tp":0.048,"tn":1.0},"LoneChimney":{"tp":0.042,"tn":1.0},"McAlester":{"tp":0.023,"tn":0.64},"McGeeCreek":{"tp":0.017,"tn":0.6},"McMurtry":{"tp":0.042,"tn":1.0},"Murray":{"tp":0.021,"tn":0.76},"NewSpiro":{"tp":0.024,"tn":0.64},"Okemah":{"tp":0.022,"tn":0.76},"Okmulgee":{"tp":0.022,"tn":0.76},"Oologah":{"tp":0.024,"tn":0.78},"Overholser":{"tp":0.051,"tn":1.0},"PaulsValley":{"tp":0.045,"tn":1.0},"Pawnee":{"tp":0.048,"tn":1.0},"Perry":{"tp":0.042,"tn":1.0},"PineCreek":{"tp":0.018,"tn":0.6},"Ponca":{"tp":0.042,"tn":1.0},"RCLongmire":{"tp":0.023,"tn":0.76},"RobertSKerr":{"tp":0.022,"tn":0.64},"Rocky":{"tp":0.059,"tn":1.0},"Sahoma":{"tp":0.023,"tn":0.76},"Sardis":{"tp":0.018,"tn":0.6},"ShawneeTwin1":{"tp":0.022,"tn":0.76},"ShawneeTwin2":{"tp":0.023,"tn":0.76},"Shell":{"tp":0.022,"tn":0.76},"Skiatook":{"tp":0.021,"tn":0.76},"Sooner":{"tp":0.038,"tn":1.0},"Spavinaw":{"tp":0.025,"tn":0.78},"StanleyDraper":{"tp":0.038,"tn":1.0},"Stroud":{"tp":0.022,"tn":0.76},"Talawanda1":{"tp":0.023,"tn":0.64},"Talawanda2":{"tp":0.022,"tn":0.64},"Tecumseh":{"tp":0.026,"tn":0.76},"TenkillerFerry":{"tp":0.016,"tn":0.69},"Texoma":{"tp":0.021,"tn":0.76},"Thunderbird":{"tp":0.038,"tn":1.0},"TomSteed":{"tp":0.048,"tn":1.0},"WRHolway":{"tp":0.024,"tn":0.78},"Walters":{"tp":0.055,"tn":1.0},"Waurika":{"tp":0.042,"tn":1.0},"WayneWallace":{"tp":0.018,"tn":0.6},"WebbersFalls":{"tp":0.022,"tn":0.76},"WesWatkins":{"tp":0.023,"tn":0.76},"Wewoka":{"tp":0.023,"tn":0.76},"Wister":{"tp":0.023,"tn":0.64}};
+const REF_LINES_BASE={"chl":[{"v":10,"lbl":"10 µg/L (SWS Criterion)","c":"#E69F00"},{"v":20,"lbl":"20 µg/L (Eutrophication)","c":"#D55E00"}],"turb":[{"v":25,"lbl":"25 NTU (Lake Criterion)","c":"#0072B2"}],"sec":[]};
+function getRefLines(pkey,lakeKey){
+  if(pkey==='p'){
+    const th=LAKE_THRESHOLDS[lakeKey];
+    const v=th?th.tp:0.037;
+    return [{v:v,lbl:v.toFixed(3)+' mg/L (EPA Criteria Threshold)',"c":"#009E73"}];
+  }
+  if(pkey==='n'){
+    const th=LAKE_THRESHOLDS[lakeKey];
+    const v=th?th.tn:0.54;
+    return [{v:v,lbl:v.toFixed(3)+' mg/L (EPA Criteria Threshold)',"c":"#009E73"}];
+  }
+  return REF_LINES_BASE[pkey]||[];
+}
 const PM={
   chl:{label:'Chlorophyll-a',   unit:'µg/L',dotC:'rgba(33,102,172,0.6)',lineC:'#b2182b',cls:'pb-chl',tc:'t-chl'},
   p:  {label:'Total Phosphorus',unit:'mg/L',dotC:'rgba(33,102,172,0.6)',lineC:'#b2182b',cls:'pb-p',  tc:'t-p'},
@@ -1613,7 +1627,7 @@ function qc(k,d){
   if(!d||d==='ns'||d==='nan'||d==='')return 'ns-trend';
   return ((k!=='sec')?(d==='up'):(d==='down'))?'bad':'good';
 }
-function drawChart(canvas,pkey,pdata,sharedPadL){
+function drawChart(canvas,pkey,pdata,sharedPadL,lakeKey){
   const m=PM[pkey];
   // Use integer CSS dimensions to prevent fractional DPR mismatches
   const dpr=Math.ceil(window.devicePixelRatio||1);
@@ -1641,7 +1655,7 @@ function drawChart(canvas,pkey,pdata,sharedPadL){
 
   // Y range
   const aY=[...tp.map(p=>p[1]),...dp.map(p=>p[1])];
-  (REF_LINES[pkey]||[]).forEach(r=>aY.push(r.v));
+  getRefLines(pkey,lakeKey).forEach(r=>aY.push(r.v));
   let mn=Math.min(...aY),mx=Math.max(...aY);
   const pd=(mx-mn)*0.13||Math.abs(mx)*0.1||1;
   mn=Math.max(0,mn-pd);mx+=pd;const rng=mx-mn||1;
@@ -1673,7 +1687,7 @@ function drawChart(canvas,pkey,pdata,sharedPadL){
   }
 
   // Reference lines — all snapped
-  (REF_LINES[pkey]||[]).forEach(ref=>{
+  getRefLines(pkey,lakeKey).forEach(ref=>{
     if(ref.v<mn||ref.v>mx)return;
     const ry=snapY(py(ref.v));
     ctx.save();
@@ -1919,7 +1933,7 @@ function openAllChartsModal(lakeKey, info) {
       grid.querySelectorAll('.modal-chart-panel canvas').forEach((cv,idx)=>{
         const k=sigParams[idx];
         cv.style.height='100%';
-        drawChart(cv,k,p[k],maxPadL);
+        drawChart(cv,k,p[k],maxPadL,lakeKey);
       });
     }));
   }
@@ -2029,7 +2043,7 @@ function buildCard(lakeKey,info){
     // If wrap already has real size, draw immediately
     const rect = wrap.getBoundingClientRect();
     if(rect.width > 10 && rect.height > 10){
-      requestAnimationFrame(()=>requestAnimationFrame(()=>drawChart(cv,k,d)));
+      requestAnimationFrame(()=>requestAnimationFrame(()=>drawChart(cv,k,d,null,lakeKey)));
       return;
     }
     // Otherwise watch for first resize event on the wrap
@@ -2040,7 +2054,7 @@ function buildCard(lakeKey,info){
         if(cw > 10 && ch > 10 && !fired){
           fired = true;
           ro.disconnect();
-          requestAnimationFrame(()=>requestAnimationFrame(()=>drawChart(cv,k,d)));
+          requestAnimationFrame(()=>requestAnimationFrame(()=>drawChart(cv,k,d,null,lakeKey)));
         }
       }
     });
@@ -2050,7 +2064,7 @@ function buildCard(lakeKey,info){
       if(!fired){
         fired = true;
         ro.disconnect();
-        requestAnimationFrame(()=>requestAnimationFrame(()=>drawChart(cv,k,d)));
+        requestAnimationFrame(()=>requestAnimationFrame(()=>drawChart(cv,k,d,null,lakeKey)));
       }
     }, 700);
   }
