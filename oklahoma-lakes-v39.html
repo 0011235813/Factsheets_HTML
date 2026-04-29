@@ -2174,19 +2174,22 @@ function drawScene(t) {
   const ns = d.ns;
 
   // ── Sky ──────────────────────────────────────────────────────────
-  const skyHue = Math.round(200 - ns * 0.6);
+  // Sky — hue locked to blue, only saturation/lightness shift with pollution
+  const skyHue = 210;
+  const skySat  = Math.round(65 - ns * 0.22);
+  const skyLit  = Math.round(62 - ns * 0.10);
   const skyGrd = ctx.createLinearGradient(0, 0, 0, H * 0.22);
-  skyGrd.addColorStop(0, 'hsl('+skyHue+','+(Math.round(70-ns*0.3))+'%,'+(Math.round(65-ns*0.18))+'%)');
-  skyGrd.addColorStop(1, 'hsl('+skyHue+',55%,72%)');
+  skyGrd.addColorStop(0, 'hsl('+skyHue+','+skySat+'%,'+skyLit+'%)');
+  skyGrd.addColorStop(1, 'hsl('+skyHue+','+(skySat+8)+'%,'+(skyLit+10)+'%)');
   ctx.fillStyle = skyGrd;
   ctx.fillRect(0, 0, W, H * 0.22);
 
   // ── Sun ───────────────────────────────────────────────────────────
   const sunY = H * 0.09, sunX = W * 0.82;
-  const sunAlpha = Math.max(0.25, 1 - ns / 130);
-  ctx.save(); ctx.globalAlpha = sunAlpha;
+  // Sun — always full brightness regardless of nutrient level
+  ctx.save(); ctx.globalAlpha = 1;
   const sunGrd = ctx.createRadialGradient(sunX, sunY, 2, sunX, sunY, 36);
-  const sunColor = ns < 50 ? '#FFE87C' : '#FF8C4A';
+  const sunColor = '#FFE87C';
   sunGrd.addColorStop(0, sunColor); sunGrd.addColorStop(0.4, sunColor+'aa'); sunGrd.addColorStop(1, 'transparent');
   ctx.fillStyle = sunGrd; ctx.beginPath(); ctx.arc(sunX, sunY, 36, 0, Math.PI*2); ctx.fill();
   ctx.globalAlpha = 1; ctx.restore();
