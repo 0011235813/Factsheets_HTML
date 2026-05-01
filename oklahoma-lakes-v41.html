@@ -2489,14 +2489,29 @@ function drawScene(t) {
 
   // ── Stratification layers (when toggled on) ────────────────────────
   if (state.stratOn) {
-    const epiH  = waterH * 0.22;
-    const metaH = waterH * 0.15;
+    // --- Dynamic stratification: layers respond to nutrient state (ns 0-100) ---
+    // As ns rises: epilimnion thickens (algae trap heat at surface),
+    // thermocline shallows, hypolimnion shrinks and becomes anoxic.
+    const epiRatio  = 0.22 + ns * 0.0030;          // 0.22 (oligo) → ~0.52 (hyper)
+    const metaRatio = 0.15 - ns * 0.0008;           // 0.15 (oligo) → ~0.07 (hyper) — thinner, shallower thermocline
+    const epiH  = Math.min(waterH * 0.62, waterH * epiRatio);
+    const metaH = Math.max(waterH * 0.05, waterH * metaRatio);
     const hypoY = surfaceY + epiH + metaH;
 
+    // Hypolimnion label changes with oxygen status
+    const hypoLabel = ns >= 70 ? 'Hypolimnion (ANOXIC — dead zone)'
+                    : ns >= 50 ? 'Hypolimnion (low O₂, stressed)'
+                               : 'Hypolimnion (cold, well-oxygenated)';
+    // Hypolimnion colour darkens toward red/grey as oxygen is depleted
+    const hypoR = Math.round(140 + ns * 0.8);
+    const hypoG = Math.round(190 - ns * 1.4);
+    const hypoB = Math.round(255 - ns * 1.5);
+    const hypoColor = 'rgba(' + hypoR + ',' + Math.max(0,hypoG) + ',' + Math.max(60,hypoB) + ',0.9)';
+
     const lines = [
-      { y: surfaceY + epiH,        label: 'Epilimnion (warm, mixed)',    color: 'rgba(255,230,100,0.9)' },
-      { y: hypoY,                  label: 'Metalimnion / Thermocline',   color: 'rgba(100,220,255,0.9)' },
-      { y: hypoY + (bedY-hypoY)*0.6, label: 'Hypolimnion (cold, low DO)', color: 'rgba(140,190,255,0.9)' },
+      { y: surfaceY + epiH, label: 'Epilimnion (warm, mixed)',  color: 'rgba(255,230,100,0.9)' },
+      { y: hypoY,           label: 'Metalimnion / Thermocline', color: 'rgba(100,220,255,0.9)' },
+      { y: hypoY + (bedY - hypoY) * 0.6, label: hypoLabel,     color: hypoColor },
     ];
 
     lines.forEach(function(l) {
